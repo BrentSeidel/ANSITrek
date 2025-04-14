@@ -16,13 +16,33 @@
 --  You should have received a copy of the GNU General Public License along
 --  with ANSI Trek. If not, see <https://www.gnu.org/licenses/>.
 --
---
-with Ada.Text_IO;
-with data;
-with screen;
-procedure trek is
-begin
-   data.init;
-   screen.init;
-   screen.redraw;
-end;
+package screen is
+   --
+   type location is record
+      row : Natural;
+      col : Natural;
+   end record;
+   --
+   type size is record
+      row : Natural;
+      col : Natural;
+   end record;
+   --
+   --  Values for locations and sizes
+   --
+   screen_size : size;
+   ship_pos  : location := (row => 1, col => 1);
+   ship_size : size := (row => 6, col => 15);
+   --
+   --  Initialization only needs to be called once.
+   --
+   procedure init;
+   --
+   --  Redraws the entire screen
+   --
+   procedure redraw;
+   --
+   --  Draw ship state
+   --
+   procedure redraw_ship;
+end screen;

@@ -20,6 +20,19 @@ package data is
    --
    --  This package contains the global data types and data for the ANSI Trek game.
    --
+   type universe_size is range 1 .. 10;
+   type sector_size is range 1 .. 10;
+   --
+   type lr_pos is record
+      x : universe_size;
+      y : universe_size;
+   end record;
+   --
+   type sr_pos is record
+      x : sector_size;
+      y : sector_size;
+   end record;
+   --
    type lr_data is record
       stars     : Natural;
       enemies   : Natural;
@@ -28,5 +41,27 @@ package data is
       destroyed : Boolean;
    end record;
    --
+   type lr_universe is array (universe_size, universe_size) of lr_data;
+   --
    type sr_data is (empty, star, base, enemy1, enemy2, enemy3, planet);
+   --
+   type alert is (blue, green, red, yellow, cyan, magenta);
+   --
+   type ship_state is record
+      pos_lr  : lr_pos;
+      pos_sr  : sr_pos;
+      energy  : Natural;
+      shields : Natural;
+      status  : alert;
+   end record;
+   --
+   --  Main data structures
+   --
+   u : lr_universe;
+   ship : ship_state;
+   --
+   --  Routines
+   --
+   procedure init;
+   procedure lr_init;
 end data;
