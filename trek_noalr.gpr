@@ -1,0 +1,20 @@
+with "../BBS-Ada/bbs.gpr";
+with "../Ada-Lisp/bbs_lisp_noalr.gpr";
+
+project trek_noalr is
+   for languages use ("Ada");
+   for Source_Dirs use ("src");
+   for Object_Dir use "obj";
+   for Main use ("trek.adb");
+   for Exec_Dir use ".";
+   package builder is
+      for switches ("Ada") use ("-s");
+   end builder;
+   package compiler is
+      for switches ("Ada") use ("-g", "-gnateE", "-gnata", "-O1");
+   end compiler;
+   package binder is
+      for switches ("Ada") use ("-Es");
+   end binder;
+end trek_noalr;
+
