@@ -18,11 +18,14 @@
 --
 --
 with Ada.Text_IO;
+with cli;
 with data;
 with screen;
 procedure trek is
 begin
    data.init;
    screen.init;
+   cli.init;
    screen.redraw;
+   cli.cmds;
 end;

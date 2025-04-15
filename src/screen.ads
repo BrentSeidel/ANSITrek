@@ -31,8 +31,12 @@ package screen is
    --  Values for locations and sizes
    --
    screen_size : size;
-   ship_pos  : location := (row => 1, col => 1);
+   ship_pos  : location := (row => 13, col => 1);
    ship_size : size := (row => 6, col => 15);
+   sect_pos  : location := (row => 1, col => 1);
+   sect_size : size := (row => 11, col => 21);
+   univ_pos  : location := (row => 1, col => 23);
+   univ_size : size := (row => 11, col => 51);
    --
    --  Initialization only needs to be called once.
    --
@@ -44,5 +48,13 @@ package screen is
    --
    --  Draw ship state
    --
-   procedure redraw_ship;
+   procedure draw_ship;
+   --
+   --  Draw the sector map
+   --
+   procedure draw_sect;
+   --
+   --  Draw the galaxy map
+   --
+   procedure draw_univ;
 end screen;
