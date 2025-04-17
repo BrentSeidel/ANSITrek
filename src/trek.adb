@@ -26,6 +26,6 @@ begin
    data.init;
    screen.init;
    cli.init;
-   screen.redraw;
+--   screen.redraw;
    cli.cmds;
 end;

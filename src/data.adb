@@ -25,18 +25,12 @@ package body data is
       rnd_planet.Reset(g3);
       rnd_bool.Reset(g4);
       rnd_sect.Reset(g5);
-      ship.pos_lr.x := (universe_size'First + universe_size'Last) / 2;
-      ship.pos_lr.y := (universe_size'First + universe_size'Last) / 2;
-      ship.pos_sr.x := (sector_size'First + sector_size'Last) / 2 + 1;
-      ship.pos_sr.y := (sector_size'First + sector_size'Last) / 2;
-      ship.energy := 100000;
-      ship.shield := 1000;
-      ship.status := green;
-      lr_init;
-      sr_init(ship.pos_lr.x, ship.pos_lr.y);
+      init_ship;
+      init_lr;
+      init_sr(ship.pos_lr.x, ship.pos_lr.y);
    end;
    --
-   procedure lr_init is
+   procedure init_lr is
       lr : lr_data;
    begin
       for i in universe_size'Range loop
@@ -53,7 +47,7 @@ package body data is
       u(ship.pos_lr.x, ship.pos_lr.y).discover := True;
    end;
    --
-   procedure sr_init(x, y : universe_size) is
+   procedure init_sr(x, y : universe_size) is
       x1 : sector_size := rnd_sect.Random(g5);
       y1 : sector_size := rnd_sect.Random(g5);
    begin
@@ -92,4 +86,19 @@ package body data is
          sect(x1, y1) := base;
       end if;
    end;
+   --
+   procedure init_ship is
+   begin
+      ship.pos_lr.x := (universe_size'First + universe_size'Last) / 2;
+      ship.pos_lr.y := (universe_size'First + universe_size'Last) / 2;
+      ship.pos_sr.x := (sector_size'First + sector_size'Last) / 2 + 1;
+      ship.pos_sr.y := (sector_size'First + sector_size'Last) / 2;
+      ship.energy  := full_fuel;
+      ship.shield  := 1000;
+      ship.status  := green;
+      ship.torpedo := full_torp;
+      ship.elapsed := 0;
+      ship.loc     := space;
+   end;
+   --
 end data;

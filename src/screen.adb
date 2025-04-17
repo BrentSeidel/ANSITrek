@@ -19,6 +19,8 @@
 with Ada.Text_IO;
 with BBS.ANSI;
 use type BBS.ANSI.term_type;
+with cas;
+use type cas.msg_prio;
 with data;
 use type data.sector_size;
 use type data.universe_size;
@@ -50,10 +52,10 @@ package body screen is
    procedure redraw is
    begin
       Ada.Text_IO.Put(BBS.ANSI.cls);
-      draw_ship;
       draw_sect;
       draw_univ;
---      Ada.Text_IO.Put(BBS.ANSI.posCursor(45, 1));
+      draw_ship;
+      draw_cas;
    end;
    --
    --  Draw ship state
@@ -64,43 +66,50 @@ package body screen is
       Ada.Text_IO.Put(BBS.ANSI.drawBox(ship_pos.row, ship_pos.col, ship_size.row, ship_size.col, True));
       Ada.Text_IO.Put(BBS.ANSI.si);
       Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 1, ship_pos.col + 1) & "Status");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 2, ship_pos.col + 1) & "Sector");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 3, ship_pos.col + 1) & "Position");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 4, ship_pos.col + 1) & "Energy");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 5, ship_pos.col + 1) & "Shields");
       Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 1, ship_pos.col + 8));
-      --
       case data.ship.status is
          when data.blue =>
-            Ada.Text_IO.Put(BBS.ANSI.blue & "BLUE");
+            Ada.Text_IO.Put(BBS.ANSI.blue    & "   BLUE");
          when data.green =>
-            Ada.Text_IO.Put(BBS.ANSI.green & "GREEN");
+            Ada.Text_IO.Put(BBS.ANSI.green   & "  GREEN");
          when data.red =>
-            Ada.Text_IO.Put(BBS.ANSI.red & "RED");
+            Ada.Text_IO.Put(BBS.ANSI.red     & "    RED");
          when data.yellow =>
-            Ada.Text_IO.Put(BBS.ANSI.yellow & "YELLOW");
+            Ada.Text_IO.Put(BBS.ANSI.yellow  & " YELLOW");
          when data.cyan =>
-            Ada.Text_IO.Put(BBS.ANSI.cyan & "CYAN");
+            Ada.Text_IO.Put(BBS.ANSI.cyan    & "   CYAN");
          when data.magenta =>
             Ada.Text_IO.Put(BBS.ANSI.magenta & "MAGENTA");
       end case;
       Ada.Text_IO.Put(BBS.ANSI.white);
       --
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 2, ship_pos.col + 1) & "Sector");
       Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 2, ship_pos.col + 10));
       univ_io.Put(data.ship.pos_lr.x, width => 2, base => 10);
       Ada.Text_IO.Put(",");
       univ_io.Put(data.ship.pos_lr.y, width => 2, base => 10);
       --
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 3, ship_pos.col + 1) & "Position");
       Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 3, ship_pos.col + 10));
       sect_io.Put(data.ship.pos_sr.x, width => 2, base => 10);
       Ada.Text_IO.Put(",");
       sect_io.Put(data.ship.pos_sr.y, width => 2, base => 10);
       --
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 4, ship_pos.col + 1) & "Energy");
       Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 4, ship_pos.col + 9));
       nat_io.Put(data.ship.energy, width => 6, base => 10);
       --
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 5, ship_pos.col + 1) & "Shields");
       Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 5, ship_pos.col + 9));
       nat_io.Put(data.ship.shield, width => 6, base => 10);
+      --
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 6, ship_pos.col + 1) & "Torpedos");
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 6, ship_pos.col + 9));
+      nat_io.Put(data.ship.torpedo, width => 6, base => 10);
+      --
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 7, ship_pos.col + 1) & "Time");
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 7, ship_pos.col + 9));
+      nat_io.Put(data.ship.elapsed, width => 6, base => 10);
    end;
    --
    --  Draw the sector map
@@ -113,7 +122,7 @@ package body screen is
       for i in data.sector_size'Range loop
          Ada.Text_IO.Put(BBS.ANSI.posCursor(sect_pos.row + Natural(i), sect_pos.col + 1));
          for j in data.sector_size'Range loop
-            case data.sect(i, j) is
+            case data.sect(j, i) is
                when data.empty =>
                   Ada.Text_IO.Put(" .");
                when data.star =>
@@ -152,7 +161,7 @@ package body screen is
                Ada.Text_IO.Put(" ");
             end if;
             --
-            sect := data.u(i, j);
+            sect := data.u(j, i);
             if not sect.discover then
                Ada.Text_IO.Put("---");
             elsif sect.destroyed then
@@ -175,4 +184,51 @@ package body screen is
          end loop;
       end loop;
    end;
+   --
+   --  Draw the CAS window
+   --
+   procedure draw_cas is
+      line : Natural := 1;
+   begin
+      Ada.Text_IO.Put(BBS.ANSI.so);
+      Ada.Text_IO.Put(BBS.ANSI.drawBox(cas_pos.row, cas_pos.col, cas_size.row, cas_size.col, True));
+      Ada.Text_IO.Put(BBS.ANSI.si);
+      --
+      --  Alerts first
+      --
+      Ada.Text_IO.Put(BBS.ANSI.red);
+      for m in cas.messages loop
+         exit when line > cas_size.row;
+         if cas.msg_list(m).active and (cas.msg_list(m).priority = cas.alert) then
+            Ada.Text_IO.Put(BBS.ANSI.posCursor(cas_pos.row + line, cas_pos.col + 1));
+            Ada.Text_IO.Put(cas.msg_text(m));
+            line := line + 1;
+         end if;
+      end loop;
+      --
+      --  Then warnings
+      --
+      Ada.Text_IO.Put(BBS.ANSI.yellow);
+      for m in cas.messages loop
+         exit when line > cas_size.row;
+         if cas.msg_list(m).active and (cas.msg_list(m).priority = cas.warning) then
+            Ada.Text_IO.Put(BBS.ANSI.posCursor(cas_pos.row + line, cas_pos.col + 1));
+            Ada.Text_IO.Put(cas.msg_text(m));
+            line := line + 1;
+         end if;
+      end loop;
+      --
+      --  Finally info messages
+      --
+      Ada.Text_IO.Put(BBS.ANSI.white);
+      for m in cas.messages loop
+         exit when line > cas_size.row;
+         if cas.msg_list(m).active and (cas.msg_list(m).priority = cas.info) then
+            Ada.Text_IO.Put(BBS.ANSI.posCursor(cas_pos.row + line, cas_pos.col + 1));
+            Ada.Text_IO.Put(cas.msg_text(m));
+            line := line + 1;
+         end if;
+      end loop;
+   end;
+   --
 end screen;

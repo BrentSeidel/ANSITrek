@@ -16,6 +16,7 @@
 --  You should have received a copy of the GNU General Public License along
 --  with ANSI Trek. If not, see <https://www.gnu.org/licenses/>.
 --
+with Ada.Strings.Unbounded;
 package screen is
    --
    type location is record
@@ -32,11 +33,20 @@ package screen is
    --
    screen_size : size;
    ship_pos  : location := (row => 13, col => 1);
-   ship_size : size := (row => 6, col => 15);
+   ship_size : size := (row => 8, col => 15);
+   --
    sect_pos  : location := (row => 1, col => 1);
    sect_size : size := (row => 11, col => 21);
+   --
    univ_pos  : location := (row => 1, col => 23);
    univ_size : size := (row => 11, col => 51);
+   --
+   cas_pos  : location := (row => 13, col => 20);
+   cas_size : size := (row => 10, col => 30);
+   --
+   --  For messages
+   --
+   msg : Ada.Strings.Unbounded.Unbounded_String;
    --
    --  Initialization only needs to be called once.
    --
@@ -57,4 +67,8 @@ package screen is
    --  Draw the galaxy map
    --
    procedure draw_univ;
+   --
+   --  Draw the CAS window
+   --
+   procedure draw_cas;
 end screen;

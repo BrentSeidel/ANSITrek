@@ -20,6 +20,11 @@ with Ada.Strings.Maps.Constants;
 use type Ada.Strings.Maps.Character_Set;
 with Ada.Strings.Unbounded;
 use type Ada.Strings.Unbounded.Unbounded_String;
+with data;
+use type data.sector_size;
+use type data.universe_size;
+use type data.sr_data;
+use type data.location;
 package cli is
    --
    --  Put any needed initializations here
@@ -38,6 +43,18 @@ package cli is
    --  Discard any leading spaces
    --
    function trim(s : Ada.Strings.Unbounded.Unbounded_String) return Ada.Strings.Unbounded.Unbounded_String;
+   --
+   --  Actions
+   --
+   procedure lr_scan;
+   procedure move(r : Ada.Strings.Unbounded.Unbounded_String);
+   procedure jump(r : Ada.Strings.Unbounded.Unbounded_String);
+   procedure dock;
+   --
+   function get_galaxy_coords(r : Ada.Strings.Unbounded.Unbounded_String; v : out Boolean) return data.lr_pos;
+   function get_sector_coords(r : Ada.Strings.Unbounded.Unbounded_String; v : out Boolean) return data.sr_pos;
+   --
+   procedure update_msg;
 private
    --
    --  Space, back-space, tab, line-feed, vertical-tab, form-feed, and carriage return

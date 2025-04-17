@@ -24,6 +24,7 @@ package data is
    --
    type universe_size is range 1 .. 10;
    type sector_size is range 1 .. 10;
+   --
    subtype num_stars  is Integer range 0 .. 9;
    subtype num_planet is Integer range 0 .. 9;
    subtype num_enemy  is Integer range 0 .. 9;
@@ -59,13 +60,20 @@ package data is
    type sr_sector is array (sector_size, sector_size) of sr_data;
    --
    type alert is (blue, green, red, yellow, cyan, magenta);
+   type location is (docked, orbit, space);
    --
+   full_fuel : Natural := 100000;
+   full_torp : Natural := 20;
    type ship_state is record
-      pos_lr : lr_pos;
-      pos_sr : sr_pos;
-      energy : Natural;
-      shield : Natural;
-      status : alert;
+      pos_lr  : lr_pos;
+      pos_sr  : sr_pos;
+      energy  : Natural;
+      shield  : Natural;
+      shields : Boolean;  --  Are shields up or down?
+      status  : alert;
+      torpedo : Natural;
+      elapsed : Natural;
+      loc     : Location;
    end record;
    --
    --  Main data structures
@@ -74,13 +82,22 @@ package data is
    sect : sr_sector;
    ship : ship_state;
    --
+   --  Common constants
+   move_time : constant Natural := 1;
+   move_energy : constant Natural := 1;
+   jump_time : constant Natural := 10;
+   jump_energy : constant Natural := 10;
+   --
    --  Routines
    --
    procedure init;
-   procedure lr_init;
-   procedure sr_init(x, y : universe_size);
+   procedure init_lr;
+   procedure init_sr(x, y : universe_size);
+   procedure init_ship;
    --
 private
+   --
+   --  Random number generator states
    --
    g1 : rnd_star.Generator;
    g2 : rnd_enem.Generator;
