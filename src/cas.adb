@@ -35,8 +35,22 @@ package body cas is
             return "In orbit around a planet";
          when no_orbit =>
             return "Ship not adjacent to planet";
+         when no_torp =>
+            return "No torpedos to launch";
          when occupied =>
             return "Destination occupied";
+         when  dest_self =>
+            return "You have destroyed yourself";
+         when dest_base =>
+            return "Starbase destroyed";
+         when dest_planet =>
+            return "Planet destroyed";
+         when dest_star =>
+            return "Star destroyed";
+         when dest_enemy1 =>
+            return "Enemy destroyed";
+         when dest_empty =>
+            return "A brief star shone in the blackness";
       end case;
    end;
    --

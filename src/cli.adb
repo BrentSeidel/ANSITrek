@@ -59,6 +59,8 @@ package body cli is
             move(rest);
          elsif first = "DOCK" then
             dock;
+         elsif first = "TORP" then
+            torpedo(rest);
          elsif first = "QUIT" then
             Ada.Text_IO.Put_Line(BBS.ANSI.rst);
             return;
@@ -210,6 +212,46 @@ package body cli is
          data.ship.torpedo := data.full_torp;
       else
          cas.set_msg(cas.no_dock, cas.warning, True);
+      end if;
+   end;
+   --
+   --  Launch a torpedo at a target
+   --
+   procedure torpedo(r : Ada.Strings.Unbounded.Unbounded_String) is
+      valid : Boolean;
+      pos : data.sr_pos := get_sector_coords(r, valid);
+      lr : data.lr_pos := data.ship.pos_lr;
+      target : data.sr_data;
+   begin
+      if data.ship.torpedo = 0 then
+         cas.set_msg(cas.no_torp, cas.warning, True);
+         return;
+      end if;
+      if valid then
+         target := data.sect(pos.x, pos.y);
+         data.ship.torpedo := data.ship.torpedo - 1;
+         data.sect(pos.x, pos.y) := data.empty;
+         if target = data.self then
+            data.ship.energy := 0;
+            cas.set_msg(cas.dest_self, cas.alert, False);
+         elsif target = data.base then
+            cas.set_msg(cas.dest_base, cas.alert, True);
+            data.u(lr.x, lr.y).base := False;
+            if data.ship.loc = data.docked then
+               data.ship.loc := data.space;
+            end if;
+         elsif target = data.planet then
+            cas.set_msg(cas.dest_planet, cas.alert, True);
+            data.u(lr.x, lr.y).planets := data.u(lr.x, lr.y).planets - 1;
+         elsif target = data.star then
+            cas.set_msg(cas.dest_star, cas.alert, True);
+            data.u(lr.x, lr.y).stars := data.u(lr.x, lr.y).stars - 1;
+         elsif target = data.enemy1 then
+            cas.set_msg(cas.dest_enemy1, cas.alert, True);
+            data.u(lr.x, lr.y).enemies := data.u(lr.x, lr.y).enemies - 1;
+         elsif target = data.empty then
+            cas.set_msg(cas.dest_empty, cas.info, True);
+         end if;
       end if;
    end;
    --
