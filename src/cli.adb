@@ -38,9 +38,26 @@ package body cli is
       prompt : constant String := BBS.ANSI.posCursor(25, 1) & "CMD>";
    begin
       loop
+         --
+         --  Special stuff to do while docked
+         --
+         if data.ship.loc = data.docked then
+            data.ship.energy  := data.full_fuel;
+            data.ship.torpedo := data.full_torp;
+         end if;
+         --
+         --  Special stuff to do while in orbit
+         --
+         null;
+         --
+         --  Other updates
+         --
          update_msg;
          screen.redraw;
          cas.clear_once;
+         --
+         --  Get and process commands
+         --
          Ada.Text_IO.Put(prompt);
          Ada.Text_IO.Unbounded_IO.Get_Line(rest);
          --
@@ -67,8 +84,6 @@ package body cli is
          else
             cas.set_msg(cas.cmd_unknown, cas.info, True);
          end if;
---         Ada.Text_IO.Put("Press return to continue");
---         Ada.Text_IO.Unbounded_IO.Get_Line(rest);
       end loop;
    end;
    --
@@ -208,8 +223,6 @@ package body cli is
       --
       if base_detected then
          data.ship.loc := data.docked;
-         data.ship.energy  := data.full_fuel;
-         data.ship.torpedo := data.full_torp;
       else
          cas.set_msg(cas.no_dock, cas.warning, True);
       end if;

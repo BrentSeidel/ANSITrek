@@ -18,46 +18,32 @@
 --
 package body cas is
    --
-   function msg_text(m : messages) return String is
+   --  Attach the messages to the message array.
+   --
+   procedure init is
    begin
-      case m is
-         when enemies =>
-            return "Enemies detected in sector";
-         when power =>
-            return "Power is low";
-         when cmd_unknown =>
-            return "Unknown command";
-         when docked =>
-            return "Docked to starbase";
-         when no_dock =>
-            return "Ship not adjacent to starbase";
-         when in_orbit =>
-            return "In orbit around a planet";
-         when no_orbit =>
-            return "Ship not adjacent to planet";
-         when no_torp =>
-            return "No torpedos to launch";
-         when occupied =>
-            return "Destination occupied";
-         when  dest_self =>
-            return "You have destroyed yourself";
-         when dest_base =>
-            return "Starbase destroyed";
-         when dest_planet =>
-            return "Planet destroyed";
-         when dest_star =>
-            return "Star destroyed";
-         when dest_enemy1 =>
-            return "Enemy destroyed";
-         when dest_empty =>
-            return "A brief star shone in the blackness";
-      end case;
+      msg_list(enemies).text     := msg_enemies'Access;
+      msg_list(power).text       := msg_power'Access;
+      msg_list(cmd_unknown).text := msg_cmd_unknown'Access;
+      msg_list(docked).text      := msg_docked'Access;
+      msg_list(no_dock).text     := msg_no_dock'Access;
+      msg_list(in_orbit).text    := msg_in_orbit'Access;
+      msg_list(no_orbit).text    := msg_no_orbit'Access;
+      msg_list(no_torp).text     := msg_no_torp'Access;
+      msg_list(occupied).text    := msg_occupied'Access;
+      msg_list(dest_self).text   := msg_dest_self'Access;
+      msg_list(dest_base).text   := msg_dest_base'Access;
+      msg_list(dest_planet).text := msg_dest_planet'Access;
+      msg_list(dest_star).text   := msg_dest_star'Access;
+      msg_list(dest_enemy1).text := msg_dest_enemy1'Access;
+      msg_list(dest_empty).text  := msg_dest_empty'Access;
    end;
    --
    procedure set_msg(m : messages; p : msg_prio; o : Boolean) is
-     temp : constant msg := (priority => p, active => True, once => o);
    begin
-      msg_list(m) := temp;
+      msg_list(m).priority := p;
+      msg_list(m).active := True;
+      msg_list(m).once := o;
    end;
    --
    procedure clear_msg(m : messages) is

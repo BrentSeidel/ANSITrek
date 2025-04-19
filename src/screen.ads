@@ -42,7 +42,7 @@ package screen is
    univ_size : size := (row => 11, col => 51);
    --
    cas_pos  : location := (row => 13, col => 20);
-   cas_size : size := (row => 10, col => 30);
+   cas_size : size := (row => 10, col => 40);
    --
    --  For messages
    --

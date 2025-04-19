@@ -18,6 +18,7 @@
 --
 --
 with Ada.Text_IO;
+with cas;
 with cli;
 with data;
 with screen;
@@ -26,6 +27,6 @@ begin
    data.init;
    screen.init;
    cli.init;
---   screen.redraw;
+   cas.init;
    cli.cmds;
 end;
