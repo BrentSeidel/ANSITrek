@@ -63,7 +63,9 @@ package data is
    type location is (docked, orbit, space);
    --
    full_fuel : Natural := 100000;
+   full_crew : Natural := 500;
    full_torp : Natural := 20;
+   --
    type ship_state is record
       pos_lr  : lr_pos;
       pos_sr  : sr_pos;
@@ -74,7 +76,30 @@ package data is
       torpedo : Natural;
       elapsed : Natural;
       loc     : Location;
+      crew    : Natural;
    end record;
+   --
+   --  Enemy data
+   --
+   type enemy_state is record
+      pos    : sr_pos;
+      energy : Natural;
+      destr  : Boolean;
+   end record;
+   type enemy_list is array (1 .. 10) of enemy_state;
+   enemy_count : Natural range 0 .. 10;
+   enemies : enemy_list;
+   --
+   --  Planet resources
+   --
+   type planet_state is record
+      pos   : sr_pos;
+      fuel  : Natural;
+      destr : Boolean;
+   end record;
+   type planet_list is array (1 .. 10) of planet_state;
+   planet_count : Natural range 0 .. 10;
+   planets : planet_list;
    --
    --  Main data structures
    --
@@ -95,6 +120,13 @@ package data is
    procedure init_sr(x, y : universe_size);
    procedure init_ship;
    --
+   --  Utility functions
+   --
+   --  Destroy the objects at the specified location
+   --
+   procedure dest_planet(p : sr_pos);
+   procedure dest_enemy(p : sr_pos);
+   --
 private
    --
    --  Random number generator states
@@ -104,5 +136,4 @@ private
    g3 : rnd_planet.Generator;
    g4 : rnd_bool.Generator;
    g5 : rnd_sect.Generator;
-   --
 end data;

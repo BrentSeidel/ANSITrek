@@ -16,6 +16,8 @@
 --  You should have received a copy of the GNU General Public License along
 --  with ANSI Trek. If not, see <https://www.gnu.org/licenses/>.
 --
+with Ada.Text_IO;
+with cas;
 package body data is
    --
    procedure init is
@@ -50,13 +52,20 @@ package body data is
    procedure init_sr(x, y : universe_size) is
       x1 : sector_size := rnd_sect.Random(g5);
       y1 : sector_size := rnd_sect.Random(g5);
+      index : Natural;
    begin
+      --
+      --  Initialize sector to empty
       for i in sector_size'Range loop
          for j in sector_size'Range loop
             sect(i, j) := empty;
          end loop;
       end loop;
+      --
+      --  Add stuff to sector
+      --
       sect(ship.pos_sr.x, ship.pos_sr.y) := self;
+      --
       for i in 1 .. u(x, y).stars loop
          while sect(x1, y1) /= empty loop
             x1 := rnd_sect.Random(g5);
@@ -64,20 +73,35 @@ package body data is
          end loop;
          sect(x1, y1) := star;
       end loop;
+      --
+      planet_count := u(x, y).planets;
+      index := 1;
       for i in 1 .. u(x, y).planets loop
          while sect(x1, y1) /= empty loop
             x1 := rnd_sect.Random(g5);
             y1 := rnd_sect.Random(g5);
          end loop;
          sect(x1, y1) := planet;
+         planets(index).pos := (x1, y1);
+         planets(index).fuel := 100;
+         planets(index).destr := False;
+         index := index + 1;
       end loop;
+      --
+      enemy_count := u(x, y).enemies;
+      index := 1;
       for i in 1 .. u(x, y).enemies loop
          while sect(x1, y1) /= empty loop
             x1 := rnd_sect.Random(g5);
             y1 := rnd_sect.Random(g5);
          end loop;
          sect(x1, y1) := enemy1;
+         enemies(index).pos := (x1, y1);
+         enemies(index).energy := 100;
+         enemies(index).destr := False;
+         index := index + 1;
       end loop;
+      --
       if u(x, y).base then
          while sect(x1, y1) /= empty loop
             x1 := rnd_sect.Random(g5);
@@ -98,7 +122,52 @@ package body data is
       ship.status  := green;
       ship.torpedo := full_torp;
       ship.elapsed := 0;
+      ship.crew    := full_crew;
       ship.loc     := space;
+   end;
+   --
+   --  Utility functions
+   --
+   --  Destroy the planet at the specified location
+   --
+   procedure dest_planet(p : sr_pos) is
+      lr : data.lr_pos := data.ship.pos_lr;
+   begin
+      if sect(p.x, p.y) /= planet then
+         cas.set_msg(cas.internal, cas.alert, True);
+         return;
+      end if;
+      sect(p.x, p.y) := empty;
+      cas.set_msg(cas.dest_planet, cas.alert, True);
+      data.u(lr.x, lr.y).planets := data.u(lr.x, lr.y).planets - 1;
+      for i in 1 .. planet_count loop
+         if (planets(i).pos.x = p.x) and (planets(i).pos.y = p.y) then
+            planets(i).destr := True;
+            planets(i).fuel := 0;
+            return;
+         end if;
+      end loop;
+      cas.set_msg(cas.internal, cas.alert, True);
+   end;
+   --
+   procedure dest_enemy(p : sr_pos) is
+      lr : data.lr_pos := data.ship.pos_lr;
+   begin
+      if sect(p.x, p.y) /= enemy1 then
+         cas.set_msg(cas.internal, cas.alert, True);
+         return;
+      end if;
+      sect(p.x, p.y) := empty;
+      cas.set_msg(cas.dest_enemy1, cas.alert, True);
+      data.u(lr.x, lr.y).enemies := data.u(lr.x, lr.y).enemies - 1;
+      for i in 1 .. enemy_count loop
+         if (enemies(i).pos.x = p.x) and (enemies(i).pos.y = p.y) then
+            enemies(i).destr := True;
+            enemies(i).energy := 0;
+            return;
+         end if;
+      end loop;
+      cas.set_msg(cas.internal, cas.alert, True);
    end;
    --
 end data;

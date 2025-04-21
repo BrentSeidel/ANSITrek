@@ -6,3 +6,7 @@ to trek52 on the PDP-11.
 Since there are very few terminals left anymore the interface assumes
 an adjustable ANSI style terminal interface with dimensions of 132x48
 (the dimensions may change as the user interface gets developed).
+
+This particular game is not as tied to Star Trek as some of the other versions.
+The goal is to make much of the names configurable so that one could use it
+to play in other universes besides Star Trek.

@@ -35,20 +35,28 @@ package body cli is
    procedure cmds is
       first : Ada.Strings.Unbounded.Unbounded_String;
       rest  : Ada.Strings.Unbounded.Unbounded_String;
-      prompt : constant String := BBS.ANSI.posCursor(25, 1) & "CMD>";
+      prompt : constant String := BBS.ANSI.posCursor(27, 1) & "CMD>";
    begin
       loop
          --
          --  Special stuff to do while docked
          --
          if data.ship.loc = data.docked then
-            data.ship.energy  := data.full_fuel;
-            data.ship.torpedo := data.full_torp;
+            if data.ship.energy < data.full_fuel then
+               data.ship.energy  := data.full_fuel;
+            end if;
+            if data.ship.torpedo < data.full_torp then
+               data.ship.torpedo := data.full_torp;
+            end if;
+            if data.ship.crew < data.full_crew then
+               data.ship.crew := data.full_crew;
+            end if;
          end if;
          --
          --  Special stuff to do while in orbit
          --
          null;
+--         Ada.Text_IO.Unbounded_IO.Get_Line(rest);  --  This is here for debugging.
          --
          --  Other updates
          --
@@ -172,56 +180,12 @@ package body cli is
    end;
    --
    procedure dock is
-      base_detected : Boolean := False;
       pos : data.sr_pos := data.ship.pos_sr;
    begin
       --
-      --  Check for adjacent starbase
+      --  If adjacent to star base then do docking process
       --
-      if pos.x > data.sector_size'First then
-         if pos.y > data.sector_size'First then
-            if data.sect(pos.x - 1, pos.y - 1) = data.base then
-               base_detected := True;
-            end if;
-         end if;
-         if data.sect(pos.x - 1, pos.y) = data.base then
-            base_detected := True;
-         end if;
-         if pos.y < data.sector_size'Last then
-            if data.sect(pos.x - 1, pos.y + 1) = data.base then
-               base_detected := True;
-            end if;
-         end if;
-      end if;
-      if pos.y > data.sector_size'First then
-         if data.sect(pos.x, pos.y - 1) = data.base then
-            base_detected := True;
-         end if;
-      end if;
-      if pos.y < data.sector_size'Last then
-         if data.sect(pos.x, pos.y + 1) = data.base then
-            base_detected := True;
-         end if;
-      end if;
-      if pos.x < data.sector_size'Last then
-         if pos.y > data.sector_size'First then
-            if data.sect(pos.x + 1, pos.y - 1) = data.base then
-               base_detected := True;
-            end if;
-         end if;
-         if data.sect(pos.x + 1, pos.y) = data.base then
-            base_detected := True;
-         end if;
-         if pos.y < data.sector_size'Last then
-            if data.sect(pos.x + 1, pos.y + 1) = data.base then
-               base_detected := True;
-            end if;
-         end if;
-      end if;
-      --
-      --  If detected then do docking process
-      --
-      if base_detected then
+      if check_adjacent(data.base) then
          data.ship.loc := data.docked;
       else
          cas.set_msg(cas.no_dock, cas.warning, True);
@@ -243,25 +207,25 @@ package body cli is
       if valid then
          target := data.sect(pos.x, pos.y);
          data.ship.torpedo := data.ship.torpedo - 1;
-         data.sect(pos.x, pos.y) := data.empty;
          if target = data.self then
             data.ship.energy := 0;
             cas.set_msg(cas.dest_self, cas.alert, False);
+            data.sect(pos.x, pos.y) := data.empty;
          elsif target = data.base then
             cas.set_msg(cas.dest_base, cas.alert, True);
             data.u(lr.x, lr.y).base := False;
             if data.ship.loc = data.docked then
                data.ship.loc := data.space;
             end if;
+            data.sect(pos.x, pos.y) := data.empty;
          elsif target = data.planet then
-            cas.set_msg(cas.dest_planet, cas.alert, True);
-            data.u(lr.x, lr.y).planets := data.u(lr.x, lr.y).planets - 1;
+            data.dest_planet(pos);
          elsif target = data.star then
             cas.set_msg(cas.dest_star, cas.alert, True);
             data.u(lr.x, lr.y).stars := data.u(lr.x, lr.y).stars - 1;
+            data.sect(pos.x, pos.y) := data.empty;
          elsif target = data.enemy1 then
-            cas.set_msg(cas.dest_enemy1, cas.alert, True);
-            data.u(lr.x, lr.y).enemies := data.u(lr.x, lr.y).enemies - 1;
+            data.dest_enemy(pos);
          elsif target = data.empty then
             cas.set_msg(cas.dest_empty, cas.info, True);
          end if;
@@ -356,4 +320,51 @@ package body cli is
       end if;
    end;
    --
+   --  Check if ship is adjacent to object of type o.
+   --
+   function check_adjacent(o : data.sr_data) return Boolean is
+      pos : data.sr_pos := data.ship.pos_sr;
+   begin
+      if pos.x > data.sector_size'First then
+         if pos.y > data.sector_size'First then
+            if data.sect(pos.x - 1, pos.y - 1) = o then
+               return True;
+            end if;
+         end if;
+         if data.sect(pos.x - 1, pos.y) = o then
+           return True;
+         end if;
+         if pos.y < data.sector_size'Last then
+            if data.sect(pos.x - 1, pos.y + 1) = o then
+               return True;
+            end if;
+         end if;
+      end if;
+      if pos.y > data.sector_size'First then
+         if data.sect(pos.x, pos.y - 1) = o then
+            return True;
+         end if;
+      end if;
+      if pos.y < data.sector_size'Last then
+         if data.sect(pos.x, pos.y + 1) = o then
+            return True;
+         end if;
+      end if;
+      if pos.x < data.sector_size'Last then
+         if pos.y > data.sector_size'First then
+            if data.sect(pos.x + 1, pos.y - 1) = o then
+               return True;
+            end if;
+         end if;
+         if data.sect(pos.x + 1, pos.y) = o then
+            return True;
+         end if;
+         if pos.y < data.sector_size'Last then
+            if data.sect(pos.x + 1, pos.y + 1) = o then
+               return True;
+            end if;
+         end if;
+      end if;
+      return False;
+   end;
 end cli;

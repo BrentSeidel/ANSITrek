@@ -17,6 +17,7 @@
 --  with ANSI Trek. If not, see <https://www.gnu.org/licenses/>.
 --
 with Ada.Strings.Unbounded;
+with data;
 package screen is
    --
    type location is record
@@ -33,7 +34,7 @@ package screen is
    --
    screen_size : size;
    ship_pos  : location := (row => 13, col => 1);
-   ship_size : size := (row => 8, col => 15);
+   ship_size : size := (row => 10, col => 15);
    --
    sect_pos  : location := (row => 1, col => 1);
    sect_size : size := (row => 11, col => 21);
@@ -41,8 +42,14 @@ package screen is
    univ_pos  : location := (row => 1, col => 23);
    univ_size : size := (row => 11, col => 51);
    --
-   cas_pos  : location := (row => 13, col => 20);
+   cas_pos  : location := (row => 13, col => 17);
    cas_size : size := (row => 10, col => 40);
+   --
+   planet_pos  : location := (row => 14, col => 58);
+   planet_size : size := (row => 12, col => 20);
+   --
+   enemy_pos  : location := (row => 1, col => 75);
+   enemy_size : size := (row => 12, col => 20);
    --
    --  For messages
    --
@@ -71,4 +78,21 @@ package screen is
    --  Draw the CAS window
    --
    procedure draw_cas;
+   --
+   --  Draw the planets window
+   --
+   procedure draw_planet;
+   --
+   --  Draw the enemies window
+   --
+   procedure draw_enemy;
+private
+   --
+   --  Utility function to write sector position on screen
+   --
+   procedure sr_put_pos(p : data.sr_pos);
+   --
+   --  Draw a window frame and title
+   --
+   procedure frame(p : location; s : size; t : String);
 end screen;

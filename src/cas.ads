@@ -22,7 +22,7 @@ package cas is
    --
    type messages is (enemies, power, cmd_unknown, docked, no_dock, in_orbit,
                      no_orbit, no_torp, occupied, dest_self, dest_base, dest_planet,
-                     dest_star, dest_enemy1, dest_empty);
+                     dest_star, dest_enemy1, dest_empty, internal);
    --
    --  Enumeration for message priorities
    --
@@ -68,4 +68,5 @@ private
    msg_dest_star   : aliased constant String := "Star destroyed";
    msg_dest_enemy1 : aliased constant String := "Enemy destroyed";
    msg_dest_empty  : aliased constant String := "A brief star shone in the blackness";
+   msg_internal    : aliased constant String := "An internal program error occured";
 end cas;
