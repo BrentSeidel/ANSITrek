@@ -27,6 +27,7 @@ package body data is
       rnd_planet.Reset(g3);
       rnd_bool.Reset(g4);
       rnd_sect.Reset(g5);
+      Ada.Numerics.Float_Random.Reset(g6);
       init_ship;
       init_lr;
       init_sr(ship.pos_lr.x, ship.pos_lr.y);
@@ -83,7 +84,7 @@ package body data is
          end loop;
          sect(x1, y1) := planet;
          planets(index).pos := (x1, y1);
-         planets(index).fuel := 100;
+         planets(index).fuel := Natural(Ada.Numerics.Float_Random.Random(g6)*100.0);
          planets(index).destr := False;
          index := index + 1;
       end loop;
@@ -149,6 +150,8 @@ package body data is
       end loop;
       cas.set_msg(cas.internal, cas.alert, True);
    end;
+   --
+   --  Destroy an enemy at the specified location
    --
    procedure dest_enemy(p : sr_pos) is
       lr : data.lr_pos := data.ship.pos_lr;

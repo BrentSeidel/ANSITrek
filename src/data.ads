@@ -18,6 +18,7 @@
 --
 with Ada.Numerics;
 with Ada.Numerics.Discrete_Random;
+with Ada.Numerics.Float_Random;
 package data is
    --
    --  This package contains the global data types and data for the ANSI Trek game.
@@ -136,4 +137,5 @@ private
    g3 : rnd_planet.Generator;
    g4 : rnd_bool.Generator;
    g5 : rnd_sect.Generator;
+   g6 : Ada.Numerics.Float_Random.Generator;
 end data;

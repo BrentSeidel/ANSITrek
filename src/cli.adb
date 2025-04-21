@@ -84,6 +84,8 @@ package body cli is
             move(rest);
          elsif first = "DOCK" then
             dock;
+         elsif first = "ORBIT" then
+            orbit;
          elsif first = "TORP" then
             torpedo(rest);
          elsif first = "QUIT" then
@@ -179,6 +181,8 @@ package body cli is
       end if;
    end;
    --
+   --  Dock at a starbase
+   --
    procedure dock is
       pos : data.sr_pos := data.ship.pos_sr;
    begin
@@ -189,6 +193,21 @@ package body cli is
          data.ship.loc := data.docked;
       else
          cas.set_msg(cas.no_dock, cas.warning, True);
+      end if;
+   end;
+   --
+   --  Orbit a planet
+   --
+   procedure orbit is
+      pos : data.sr_pos := data.ship.pos_sr;
+   begin
+      --
+      --  If adjacent to planet then orbit
+      --
+      if check_adjacent(data.planet) then
+         data.ship.loc := data.orbit;
+      else
+         cas.set_msg(cas.no_orbit, cas.warning, True);
       end if;
    end;
    --

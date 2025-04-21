@@ -50,6 +50,7 @@ package cli is
    procedure move(r : Ada.Strings.Unbounded.Unbounded_String);
    procedure jump(r : Ada.Strings.Unbounded.Unbounded_String);
    procedure dock;
+   procedure orbit;
    procedure torpedo(r : Ada.Strings.Unbounded.Unbounded_String);
    --
    function get_galaxy_coords(r : Ada.Strings.Unbounded.Unbounded_String; v : out Boolean) return data.lr_pos;

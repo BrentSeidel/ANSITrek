@@ -129,15 +129,15 @@ package body screen is
                when data.empty =>
                   Ada.Text_IO.Put(" .");
                when data.star =>
-                  Ada.Text_IO.Put(" *");
+                  Ada.Text_IO.Put(BBS.ANSI.yellow & " *" & BBS.ANSI.white);
                when data.base =>
-                  Ada.Text_IO.Put(" B");
+                  Ada.Text_IO.Put(BBS.ANSI.green & " B" & BBS.ANSI.white);
                when data.enemy1 =>
-                  Ada.Text_IO.Put(" 1");
+                  Ada.Text_IO.Put(BBS.ANSI.red & " 1" & BBS.ANSI.white);
                when data.enemy2 =>
-                  Ada.Text_IO.Put(" 2");
+                  Ada.Text_IO.Put(BBS.ANSI.red & " 2" & BBS.ANSI.white);
                when data.enemy3 =>
-                  Ada.Text_IO.Put(" 3");
+                  Ada.Text_IO.Put(BBS.ANSI.red & " 3" & BBS.ANSI.white);
                when data.planet =>
                   Ada.Text_IO.Put(" O");
                when data.self =>
