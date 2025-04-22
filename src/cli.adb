@@ -88,6 +88,8 @@ package body cli is
             orbit;
          elsif first = "TORP" then
             torpedo(rest);
+         elsif first = "SHIELDS" then
+            shields(rest);
          elsif first = "QUIT" then
             Ada.Text_IO.Put_Line(BBS.ANSI.rst);
             return;
@@ -133,35 +135,37 @@ package body cli is
    --  Actions
    --
    procedure lr_scan is
-      x : constant data.universe_size := data.ship.pos_lr.x;
-      y : constant data.universe_size := data.ship.pos_lr.y;
+      x : constant data.galaxy_size := data.ship.pos_lr.x;
+      y : constant data.galaxy_size := data.ship.pos_lr.y;
    begin
-      if x > data.universe_size'First then
-         if y > data.universe_size'First then
+      if x > data.galaxy_size'First then
+         if y > data.galaxy_size'First then
             data.u(x - 1, y - 1).discover := True;
          end if;
          data.u(x - 1, y).discover := True;
-         if y < data.universe_size'Last then
+         if y < data.galaxy_size'Last then
             data.u(x - 1, y + 1).discover := True;
          end if;
       end if;
-      if y > data.universe_size'First then
+      if y > data.galaxy_size'First then
          data.u(x, y - 1).discover := True;
       end if;
       data.u(x, y).discover := True;
-      if y < data.universe_size'Last then
+      if y < data.galaxy_size'Last then
          data.u(x, y + 1).discover := True;
       end if;
-      if x < data.universe_size'Last then
-         if y > data.universe_size'First then
+      if x < data.galaxy_size'Last then
+         if y > data.galaxy_size'First then
             data.u(x + 1, y - 1).discover := True;
          end if;
          data.u(x + 1, y).discover := True;
-         if y < data.universe_size'Last then
+         if y < data.galaxy_size'Last then
             data.u(x + 1, y + 1).discover := True;
          end if;
       end if;
    end;
+   --
+   --  Move within a sector
    --
    procedure move(r : Ada.Strings.Unbounded.Unbounded_String) is
       valid : Boolean;
@@ -178,6 +182,23 @@ package body cli is
          else
             cas.set_msg(cas.occupied, cas.info, True);
          end if;
+      end if;
+   end;
+   --
+   --  Move to another sector
+   --
+   procedure jump(r : Ada.Strings.Unbounded.Unbounded_String) is
+      valid : Boolean;
+      pos : data.lr_pos := get_galaxy_coords(r, valid);
+   begin
+      if valid then
+         data.ship.energy  := data.ship.energy - data.jump_energy;
+         data.ship.elapsed := data.ship.elapsed + data.jump_time;
+         data.ship.pos_lr := pos;
+         data.ship.pos_sr.x := data.sector_size'Last/2;
+         data.ship.pos_sr.y := data.sector_size'Last/2;
+         data.init_sr(pos.x, pos.y);
+         data.ship.loc := data.space;
       end if;
    end;
    --
@@ -238,54 +259,64 @@ package body cli is
             end if;
             data.sect(pos.x, pos.y) := data.empty;
          elsif target = data.planet then
-            data.dest_planet(pos);
+            data.attack_planet(pos, data.torp_energy);
          elsif target = data.star then
             cas.set_msg(cas.dest_star, cas.alert, True);
             data.u(lr.x, lr.y).stars := data.u(lr.x, lr.y).stars - 1;
             data.sect(pos.x, pos.y) := data.empty;
          elsif target = data.enemy1 then
-            data.dest_enemy(pos);
+            data.attack_enemy(pos, data.torp_energy);
          elsif target = data.empty then
             cas.set_msg(cas.dest_empty, cas.info, True);
          end if;
       end if;
    end;
    --
-   procedure jump(r : Ada.Strings.Unbounded.Unbounded_String) is
-      valid : Boolean;
-      pos : data.lr_pos := get_galaxy_coords(r, valid);
+   --  Control shields
+   --
+   procedure shields(r : Ada.Strings.Unbounded.Unbounded_String) is
+      first : Ada.Strings.Unbounded.Unbounded_String;
+      rest  : Ada.Strings.Unbounded.Unbounded_String := r;
+      temp  : Integer;
    begin
-      if valid then
-         data.ship.energy  := data.ship.energy - data.jump_energy;
-         data.ship.elapsed := data.ship.elapsed + data.jump_time;
-         data.ship.pos_lr := pos;
-         data.ship.pos_sr.x := data.sector_size'Last/2;
-         data.ship.pos_sr.y := data.sector_size'Last/2;
-         data.init_sr(pos.x, pos.y);
-         data.ship.loc := data.space;
+      split(first, rest);
+      Ada.Strings.Unbounded.Translate(first, Ada.Strings.Maps.Constants.Upper_Case_Map);
+      if first = "UP" then
+         data.ship.shields := True;
+      elsif first = "DOWN" then
+         data.ship.shields := False;
+      else
+         temp := Integer'Value(Ada.Strings.Unbounded.To_String(first));
+         if (temp >= 0) and (temp < data.ship.energy) then
+            data.ship.shield := Natural(temp);
+         else
+            cas.set_msg(cas.invalid, cas.info, True);
+         end if;
       end if;
    end;
    --
    function get_galaxy_coords(r : Ada.Strings.Unbounded.Unbounded_String; v : out Boolean) return data.lr_pos is
       first : Ada.Strings.Unbounded.Unbounded_String;
       rest  : Ada.Strings.Unbounded.Unbounded_String := r;
-      pos   : data.lr_pos := (data.universe_size'First, data.universe_size'First);
+      pos   : data.lr_pos := (data.galaxy_size'First, data.galaxy_size'First);
       temp  : Integer;
    begin
       v := True;
       split(first, rest);
       temp := Integer'Value(Ada.Strings.Unbounded.To_String(first));
-      if (temp >= Integer(data.universe_size'First)) and (temp <= Integer(data.universe_size'Last)) then
-         pos.x := data.universe_size(temp);
+      if (temp >= Integer(data.galaxy_size'First)) and (temp <= Integer(data.galaxy_size'Last)) then
+         pos.x := data.galaxy_size(temp);
       else
+         cas.set_msg(cas.invalid, cas.info, True);
          v := False;
          return pos;
       end if;
       split(first, rest);
       temp := Integer'Value(Ada.Strings.Unbounded.To_String(first));
-      if (temp >= Integer(data.universe_size'First)) and (temp <= Integer(data.universe_size'Last)) then
-         pos.y := data.universe_size(temp);
+      if (temp >= Integer(data.galaxy_size'First)) and (temp <= Integer(data.galaxy_size'Last)) then
+         pos.y := data.galaxy_size(temp);
       else
+         cas.set_msg(cas.invalid, cas.info, True);
          v := False;
          return pos;
       end if;
@@ -304,6 +335,7 @@ package body cli is
       if (temp >= Integer(data.sector_size'First)) and (temp <= Integer(data.sector_size'Last)) then
          pos.x := data.sector_size(temp);
       else
+         cas.set_msg(cas.invalid, cas.info, True);
          v := False;
          return pos;
       end if;
@@ -312,6 +344,7 @@ package body cli is
       if (temp >= Integer(data.sector_size'First)) and (temp <= Integer(data.sector_size'Last)) then
          pos.y := data.sector_size(temp);
       else
+         cas.set_msg(cas.invalid, cas.info, True);
          v := False;
          return pos;
       end if;

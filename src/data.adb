@@ -36,10 +36,12 @@ package body data is
    procedure init_lr is
       lr : lr_data;
    begin
-      for i in universe_size'Range loop
-         for j in universe_size'Range loop
+      total_enemies := 0;
+      for i in galaxy_size'Range loop
+         for j in galaxy_size'Range loop
             lr.stars   := rnd_star.Random(g1);
             lr.enemies := rnd_enem.Random(g2);
+            total_enemies := total_enemies + lr.enemies;
             lr.planets := rnd_planet.Random(g3);
             lr.base    := True;
             lr.destroyed := False;
@@ -50,7 +52,7 @@ package body data is
       u(ship.pos_lr.x, ship.pos_lr.y).discover := True;
    end;
    --
-   procedure init_sr(x, y : universe_size) is
+   procedure init_sr(x, y : galaxy_size) is
       x1 : sector_size := rnd_sect.Random(g5);
       y1 : sector_size := rnd_sect.Random(g5);
       index : Natural;
@@ -114,8 +116,8 @@ package body data is
    --
    procedure init_ship is
    begin
-      ship.pos_lr.x := (universe_size'First + universe_size'Last) / 2;
-      ship.pos_lr.y := (universe_size'First + universe_size'Last) / 2;
+      ship.pos_lr.x := (galaxy_size'First + galaxy_size'Last) / 2;
+      ship.pos_lr.y := (galaxy_size'First + galaxy_size'Last) / 2;
       ship.pos_sr.x := (sector_size'First + sector_size'Last) / 2 + 1;
       ship.pos_sr.y := (sector_size'First + sector_size'Last) / 2;
       ship.energy  := full_fuel;
@@ -131,18 +133,21 @@ package body data is
    --
    --  Destroy the planet at the specified location
    --
-   procedure dest_planet(p : sr_pos) is
+   procedure attack_planet(p : sr_pos; e : Natural) is
       lr : data.lr_pos := data.ship.pos_lr;
    begin
       if sect(p.x, p.y) /= planet then
          cas.set_msg(cas.internal, cas.alert, True);
          return;
       end if;
-      sect(p.x, p.y) := empty;
-      cas.set_msg(cas.dest_planet, cas.alert, True);
-      data.u(lr.x, lr.y).planets := data.u(lr.x, lr.y).planets - 1;
+      --
+      --  Search for target
+      --
       for i in 1 .. planet_count loop
          if (planets(i).pos.x = p.x) and (planets(i).pos.y = p.y) then
+            sect(p.x, p.y) := empty;
+            cas.set_msg(cas.dest_planet, cas.alert, True);
+            data.u(lr.x, lr.y).planets := data.u(lr.x, lr.y).planets - 1;
             planets(i).destr := True;
             planets(i).fuel := 0;
             return;
@@ -153,20 +158,29 @@ package body data is
    --
    --  Destroy an enemy at the specified location
    --
-   procedure dest_enemy(p : sr_pos) is
+   procedure attack_enemy(p : sr_pos; e : Natural) is
       lr : data.lr_pos := data.ship.pos_lr;
    begin
       if sect(p.x, p.y) /= enemy1 then
          cas.set_msg(cas.internal, cas.alert, True);
          return;
       end if;
-      sect(p.x, p.y) := empty;
-      cas.set_msg(cas.dest_enemy1, cas.alert, True);
-      data.u(lr.x, lr.y).enemies := data.u(lr.x, lr.y).enemies - 1;
+      --
+      --  Search for target
+      --
       for i in 1 .. enemy_count loop
          if (enemies(i).pos.x = p.x) and (enemies(i).pos.y = p.y) then
-            enemies(i).destr := True;
-            enemies(i).energy := 0;
+            if e >= enemies(i).energy then
+               cas.set_msg(cas.dest_enemy1, cas.alert, True);
+               data.u(lr.x, lr.y).enemies := data.u(lr.x, lr.y).enemies - 1;
+               total_enemies := total_enemies - 1;
+               sect(p.x, p.y) := empty;
+               enemies(i).destr := True;
+               enemies(i).energy := 0;
+            else
+               cas.set_msg(cas.target_hit, cas.info, True);
+               enemies(i).energy := enemies(i).energy - e;
+            end if;
             return;
          end if;
       end loop;

@@ -38,6 +38,8 @@ package body cas is
       msg_list(dest_enemy1).text := msg_dest_enemy1'Access;
       msg_list(dest_empty).text  := msg_dest_empty'Access;
       msg_list(internal).text    := msg_internal'Access;
+      msg_list(target_hit).text  := msg_target_hit'Access;
+      msg_list(invalid).text     := msg_invalid'Access;
    end;
    --
    procedure set_msg(m : messages; p : msg_prio; o : Boolean) is

@@ -23,11 +23,11 @@ with cas;
 use type cas.msg_prio;
 with data;
 use type data.sector_size;
-use type data.universe_size;
+use type data.galaxy_size;
 package body screen is
    package nat_io is new Ada.Text_IO.Integer_IO(Natural);
    package sect_io is new Ada.Text_IO.Integer_IO(data.sector_size);
-   package univ_io is new Ada.Text_IO.Integer_IO(data.universe_size);
+   package univ_io is new Ada.Text_IO.Integer_IO(data.galaxy_size);
    --
    --  Initialization only needs to be called once.
    --
@@ -64,9 +64,6 @@ package body screen is
    --
    procedure draw_ship is
    begin
---      Ada.Text_IO.Put(BBS.ANSI.so);
---      Ada.Text_IO.Put(BBS.ANSI.drawBox(ship_pos.row, ship_pos.col, ship_size.row, ship_size.col, True));
---      Ada.Text_IO.Put(BBS.ANSI.si);
       frame(ship_pos, ship_size, "Ship");
       Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 1, ship_pos.col + 1) & "Status");
       Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 1, ship_pos.col + 8));
@@ -101,8 +98,14 @@ package body screen is
       nat_io.Put(data.ship.energy, width => 6, base => 10);
       --
       Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 5, ship_pos.col + 1) & "Shields");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 5, ship_pos.col + 9));
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 5, ship_pos.col + 8));
       nat_io.Put(data.ship.shield, width => 6, base => 10);
+      if data.ship.shields then
+         Ada.Text_IO.Put(BBS.ANSI.green & "U");
+      else
+         Ada.Text_IO.Put(BBS.ANSI.red & "D");
+      end if;
+      Ada.Text_IO.Put(BBS.ANSI.white);
       --
       Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 6, ship_pos.col + 1) & "Torpedos");
       Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 6, ship_pos.col + 9));
@@ -139,9 +142,9 @@ package body screen is
                when data.enemy3 =>
                   Ada.Text_IO.Put(BBS.ANSI.red & " 3" & BBS.ANSI.white);
                when data.planet =>
-                  Ada.Text_IO.Put(" O");
+                  Ada.Text_IO.Put(BBS.ANSI.blue & " O" & BBS.ANSI.white);
                when data.self =>
-                  Ada.Text_IO.Put(" +");
+                  Ada.Text_IO.Put(BBS.ANSI.cyan & " +" & BBS.ANSI.white);
             end case;
          end loop;
       end loop;
@@ -153,9 +156,9 @@ package body screen is
       sect : data.lr_data;
    begin
       frame(univ_pos, univ_size, "Galaxy");
-      for i in data.universe_size'Range loop
+      for i in data.galaxy_size'Range loop
          Ada.Text_IO.Put(BBS.ANSI.posCursor(univ_pos.row + Natural(i), univ_pos.col + 1));
-         for j in data.universe_size'Range loop
+         for j in data.galaxy_size'Range loop
             if (j = data.ship.pos_lr.x) and (i = data.ship.pos_lr.y) then
                Ada.Text_IO.Put("[");
             else
@@ -168,6 +171,11 @@ package body screen is
             elsif sect.destroyed then
                Ada.Text_IO.Put("***");
             else
+               if sect.enemies > 0 then
+                  Ada.Text_IO.Put(BBS.ANSI.red);
+               elsif sect.base then
+                  Ada.Text_IO.Put(BBS.ANSI.green);
+               end if;
                nat_io.put(sect.enemies, width => 1, base => 10);
                if sect.base then
                   Ada.Text_IO.Put("1");
@@ -175,6 +183,7 @@ package body screen is
                   Ada.Text_IO.Put("0");
                end if;
                nat_io.Put(sect.stars, width => 1, base => 10);
+               Ada.Text_IO.Put(BBS.ANSI.white);
             end if;
             --
             if (j = data.ship.pos_lr.x) and (i = data.ship.pos_lr.y) then

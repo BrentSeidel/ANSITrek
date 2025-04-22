@@ -22,7 +22,7 @@ with Ada.Strings.Unbounded;
 use type Ada.Strings.Unbounded.Unbounded_String;
 with data;
 use type data.sector_size;
-use type data.universe_size;
+use type data.galaxy_size;
 use type data.sr_data;
 use type data.location;
 package cli is
@@ -52,6 +52,7 @@ package cli is
    procedure dock;
    procedure orbit;
    procedure torpedo(r : Ada.Strings.Unbounded.Unbounded_String);
+   procedure shields(r : Ada.Strings.Unbounded.Unbounded_String);
    --
    function get_galaxy_coords(r : Ada.Strings.Unbounded.Unbounded_String; v : out Boolean) return data.lr_pos;
    function get_sector_coords(r : Ada.Strings.Unbounded.Unbounded_String; v : out Boolean) return data.sr_pos;

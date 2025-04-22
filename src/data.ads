@@ -23,7 +23,7 @@ package data is
    --
    --  This package contains the global data types and data for the ANSI Trek game.
    --
-   type universe_size is range 1 .. 10;
+   type galaxy_size is range 1 .. 10;
    type sector_size is range 1 .. 10;
    --
    subtype num_stars  is Integer range 0 .. 9;
@@ -37,8 +37,8 @@ package data is
    package rnd_bool is new Ada.Numerics.Discrete_Random(Boolean);
    --
    type lr_pos is record
-      x : universe_size;
-      y : universe_size;
+      x : galaxy_size;
+      y : galaxy_size;
    end record;
    --
    type sr_pos is record
@@ -57,15 +57,11 @@ package data is
    --
    type sr_data is (empty, star, base, enemy1, enemy2, enemy3, planet, self);
    --
-   type lr_universe is array (universe_size, universe_size) of lr_data;
+   type lr_galaxy is array (galaxy_size, galaxy_size) of lr_data;
    type sr_sector is array (sector_size, sector_size) of sr_data;
    --
    type alert is (blue, green, red, yellow, cyan, magenta);
    type location is (docked, orbit, space);
-   --
-   full_fuel : Natural := 100000;
-   full_crew : Natural := 500;
-   full_torp : Natural := 20;
    --
    type ship_state is record
       pos_lr  : lr_pos;
@@ -88,8 +84,6 @@ package data is
       destr  : Boolean;
    end record;
    type enemy_list is array (1 .. 10) of enemy_state;
-   enemy_count : Natural range 0 .. 10;
-   enemies : enemy_list;
    --
    --  Planet resources
    --
@@ -99,34 +93,48 @@ package data is
       destr : Boolean;
    end record;
    type planet_list is array (1 .. 10) of planet_state;
-   planet_count : Natural range 0 .. 10;
-   planets : planet_list;
    --
    --  Main data structures
    --
-   u : lr_universe;
-   sect : sr_sector;
    ship : ship_state;
    --
-   --  Common constants
-   move_time : constant Natural := 1;
+   --  Galaxy data
+   --
+   u             : lr_galaxy;
+   total_enemies : Natural;
+   --
+   --  Sector data
+   --
+   sect         : sr_sector;
+   enemy_count  : Natural range 0 .. 10;
+   enemies      : enemy_list;
+   planet_count : Natural range 0 .. 10;
+   planets      : planet_list;
+   --
+   --  Miscellaneous constants
+   --
+   move_time   : constant Natural := 1;
    move_energy : constant Natural := 1;
-   jump_time : constant Natural := 10;
+   jump_time   : constant Natural := 10;
    jump_energy : constant Natural := 10;
+   full_fuel   : constant Natural := 100000;
+   full_crew   : constant Natural := 500;
+   full_torp   : constant Natural := 20;
+   torp_energy : constant Natural := 50;
    --
    --  Routines
    --
    procedure init;
    procedure init_lr;
-   procedure init_sr(x, y : universe_size);
+   procedure init_sr(x, y : galaxy_size);
    procedure init_ship;
    --
    --  Utility functions
    --
-   --  Destroy the objects at the specified location
+   --  Attack the objects at the specified location
    --
-   procedure dest_planet(p : sr_pos);
-   procedure dest_enemy(p : sr_pos);
+   procedure attack_planet(p : sr_pos; e : Natural);
+   procedure attack_enemy(p : sr_pos; e : Natural);
    --
 private
    --
