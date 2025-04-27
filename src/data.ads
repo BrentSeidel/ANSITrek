@@ -82,6 +82,7 @@ package data is
       pos    : sr_pos;
       energy : Natural;
       destr  : Boolean;
+      shot   : Natural;
    end record;
    type enemy_list is array (1 .. 10) of enemy_state;
    --
@@ -120,7 +121,7 @@ package data is
    full_fuel   : constant Natural := 100000;
    full_crew   : constant Natural := 500;
    full_torp   : constant Natural := 20;
-   torp_energy : constant Natural := 50;
+   torp_energy : constant Natural := 1000;
    --
    --  Routines
    --
@@ -135,6 +136,10 @@ package data is
    --
    procedure attack_planet(p : sr_pos; e : Natural);
    procedure attack_enemy(p : sr_pos; e : Natural);
+   --
+   --  Compute attackes from all enemies on ship
+   --
+   procedure attack_ship;
    --
 private
    --

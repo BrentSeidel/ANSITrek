@@ -22,7 +22,8 @@ package cas is
    --
    type messages is (enemies, power, cmd_unknown, docked, no_dock, in_orbit,
                      no_orbit, no_torp, occupied, dest_self, dest_base, dest_planet,
-                     dest_star, dest_enemy1, dest_empty, internal, target_hit, invalid);
+                     dest_star, dest_enemy1, dest_empty, internal, target_hit, invalid,
+                     attack);
    --
    --  Enumeration for message priorities
    --
@@ -71,4 +72,5 @@ private
    msg_internal    : aliased constant String := "An internal program error occured";
    msg_target_hit  : aliased constant String := "Target hit";
    msg_invalid     : aliased constant String := "Invalid command";
+   msg_attack      : aliased constant String := "You have been attacked";
 end cas;

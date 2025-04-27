@@ -183,6 +183,7 @@ package body cli is
             cas.set_msg(cas.occupied, cas.info, True);
          end if;
       end if;
+      data.attack_ship;
    end;
    --
    --  Move to another sector
@@ -270,6 +271,7 @@ package body cli is
             cas.set_msg(cas.dest_empty, cas.info, True);
          end if;
       end if;
+      data.attack_ship;
    end;
    --
    --  Control shields

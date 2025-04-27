@@ -40,6 +40,7 @@ package body cas is
       msg_list(internal).text    := msg_internal'Access;
       msg_list(target_hit).text  := msg_target_hit'Access;
       msg_list(invalid).text     := msg_invalid'Access;
+      msg_list(attack).text      := msg_attack'Access;
    end;
    --
    procedure set_msg(m : messages; p : msg_prio; o : Boolean) is

@@ -99,9 +99,10 @@ package body data is
             y1 := rnd_sect.Random(g5);
          end loop;
          sect(x1, y1) := enemy1;
-         enemies(index).pos := (x1, y1);
-         enemies(index).energy := 100;
-         enemies(index).destr := False;
+         enemies(index).pos    := (x1, y1);
+         enemies(index).energy := 1000;
+         enemies(index).destr  := False;
+         enemies(index).shot   := 0;
          index := index + 1;
       end loop;
       --
@@ -185,6 +186,48 @@ package body data is
          end if;
       end loop;
       cas.set_msg(cas.internal, cas.alert, True);
+   end;
+   --
+   --  Compute attackes from all enemies on ship
+   --
+   procedure attack_ship is
+      hit : Natural;
+   begin
+      for e of enemies loop
+         --
+         --  Destroyed enemies can't attack
+         --
+         if not e.destr then
+            hit := Integer(Ada.Numerics.Float_Random.Random(g6)*Float(e.energy)*0.8);
+            e.energy := e.energy - hit;
+            e.shot := hit;
+            if hit > 0 then
+               --
+               --  Check for shields and modify hit strenght
+               --
+               if ship.shields then
+                  if hit > ship.shield then
+                     hit := hit / 2;
+                  else
+                     hit := hit / 10;
+                  end if;
+                  if hit > ship.shield then
+                     ship.shield  := 0;
+                     ship.shields := False;
+                  else
+                     ship.shield := ship.shield - 1;
+                     hit := 0;
+                  end if;
+               end if;
+               if hit > ship.energy then
+                  ship.energy := 0;
+               else
+                  ship.energy := ship.energy - hit;
+               end if;
+               cas.set_msg(cas.attack, cas.alert, True);
+            end if;
+         end if;
+      end loop;
    end;
    --
 end data;

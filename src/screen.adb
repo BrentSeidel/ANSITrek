@@ -269,6 +269,14 @@ package body screen is
             sr_put_pos(data.enemies(i).pos);
             Ada.Text_IO.Put("  ");
             nat_io.Put(data.enemies(i).energy, width => 4, base => 10);
+            Ada.Text_IO.Put("  ");
+            if data.enemies(i).shot > 0 then
+               Ada.Text_IO.Put(BBS.ANSI.red);
+               nat_io.Put(data.enemies(i).shot, width => 4, base => 10);
+               Ada.Text_IO.Put(BBS.ANSI.white);
+            else
+               Ada.Text_IO.Put("----");
+            end if;
          end if;
       end loop;
    end;
