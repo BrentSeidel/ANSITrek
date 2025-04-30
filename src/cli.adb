@@ -39,6 +39,18 @@ package body cli is
    begin
       loop
          --
+         --  Check for exit condition either your ship is desroyed or all enemies
+         --  have been destroyed.
+         --
+         if data.ship.energy = 0 then
+            Ada.Text_IO.Put_Line("Your ship has been destroyed.  The game is over." & BBS.ANSI.rst);
+            exit;
+         end if;
+         if data.total_enemies = 0 then
+            Ada.Text_IO.Put_Line("All enemies have been destroyed.  You have won." & BBS.ANSI.rst);
+            exit;
+         end if;
+         --
          --  Special stuff to do while docked
          --
          if data.ship.loc = data.docked then
@@ -323,6 +335,11 @@ package body cli is
          return pos;
       end if;
       return pos;
+   exception
+      when others =>
+         cas.set_msg(cas.invalid, cas.info, True);
+         v := False;
+         return pos;
    end;
    --
    function get_sector_coords(r : Ada.Strings.Unbounded.Unbounded_String; v : out Boolean) return data.sr_pos is
@@ -351,6 +368,11 @@ package body cli is
          return pos;
       end if;
       return pos;
+   exception
+      when others =>
+         cas.set_msg(cas.invalid, cas.info, True);
+         v := False;
+         return pos;
    end;
    --
    --  Update CAS messages
