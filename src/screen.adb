@@ -64,7 +64,7 @@ package body screen is
    --
    procedure draw_ship(w : window) is
    begin
-      frame(w, "Ship");
+      frame(w);
       Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 1, w.lCol + 1) & "Status");
       Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 1, w.lCol + 8));
       case data.ship.status is
@@ -124,7 +124,7 @@ package body screen is
    --
    procedure draw_sect(w : window) is
    begin
-      frame(w, "Sector");
+      frame(w);
       for i in data.sector_size'Range loop
          Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + Natural(i), w.lCol + 1));
          for j in data.sector_size'Range loop
@@ -155,7 +155,7 @@ package body screen is
    procedure draw_univ(w : window) is
       sect : data.lr_data;
    begin
-      frame(w, "Galaxy");
+      frame(w);
       for i in data.galaxy_size'Range loop
          Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + Natural(i), w.lCol + 1));
          for j in data.galaxy_size'Range loop
@@ -200,7 +200,7 @@ package body screen is
    procedure draw_cas(w : window) is
       line : Natural := 1;
    begin
-      frame(w, "Messages");
+      frame(w);
       --
       --  Alerts first
       --
@@ -243,7 +243,7 @@ package body screen is
    --
    procedure draw_planet(w : window) is
    begin
-      frame(w, "Planets");
+      frame(w);
       for i in 1 .. data.planet_count loop
          Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + i, w.lCol + 1));
          if data.planets(i).destr then
@@ -260,7 +260,7 @@ package body screen is
    --
    procedure draw_enemy(w : window) is
    begin
-      frame(w, "Enemies");
+      frame(w);
       for i in 1 .. data.enemy_count loop
          Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + i, w.lCol + 1));
          if data.enemies(i).destr then
@@ -281,6 +281,16 @@ package body screen is
       end loop;
    end;
    --
+   --  Draw a message window
+   --
+   procedure draw_msg(m : Ada.Strings.Unbounded.Unbounded_String) is
+      lMsg   : Natural := Ada.Strings.Unbounded.Length(m);
+      lTitle : Natural;
+   begin
+      wMsg.title := Ada.Strings.Unbounded.To_Unbounded_String("Message");
+      lTitle := Ada.Strings.Unbounded.Length(wMsg.title);
+   end;
+   --
    --  Utility function to write sector position on screen
    --
    procedure sr_put_pos(p : data.sr_pos) is
@@ -292,15 +302,15 @@ package body screen is
    --
    --  Draw a window frame and title
    --
-   procedure frame(w : window; t : String) is
-      len : Natural := t'Length;
+   procedure frame(w : window) is
+      len : Natural := Ada.Strings.Unbounded.Length(w.title);
       r   : Natural := w.lRow;
       c   : Natural := (w.sCol - len)/2 + w.lCol;
    begin
       Ada.Text_IO.Put(BBS.ANSI.so);
       Ada.Text_IO.Put(BBS.ANSI.drawBox(w.lRow, w.lCol, w.sRow, w.sCol, True));
       Ada.Text_IO.Put(BBS.ANSI.si);
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(r, c) & t);
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(r, c) & Ada.Strings.Unbounded.To_String(w.title));
    end;
    --
 end screen;

@@ -35,18 +35,20 @@ package screen is
       lCol : Natural;  --  Location column
       sRow : Natural;  --  Size in rows
       sCol : Natural;  --  Size in columns
+      title : Ada.Strings.Unbounded.Unbounded_String;
    end record;
    --
    --  Values for locations and sizes
    --
    screen_size : size;
    --
-   wShip   : window := (lRow => 13, lCol =>  1, sRow => 10, sCol => 15);
-   wSect   : window := (lRow =>  1, lCol =>  1, sRow => 11, sCol => 21);
-   wUniv   : window := (lRow =>  1, lCol => 23, sRow => 11, sCol => 51);
-   wCas    : window := (lRow => 13, lCol => 17, sRow => 10, sCol => 40);
-   wPlanet : window := (lRow => 14, lCol => 58, sRow => 12, sCol => 20);
-   wEnemy  : window := (lRow =>  1, lCol => 75, sRow => 12, sCol => 20);
+   wShip   : window := (lRow => 13, lCol =>  1, sRow => 10, sCol => 15, title => Ada.Strings.Unbounded.To_Unbounded_String("Ship"));
+   wSect   : window := (lRow =>  1, lCol =>  1, sRow => 11, sCol => 21, title => Ada.Strings.Unbounded.To_Unbounded_String("Sector"));
+   wUniv   : window := (lRow =>  1, lCol => 23, sRow => 11, sCol => 51, title => Ada.Strings.Unbounded.To_Unbounded_String("Galaxy"));
+   wCas    : window := (lRow => 13, lCol => 17, sRow => 10, sCol => 40, title => Ada.Strings.Unbounded.To_Unbounded_String("Messages"));
+   wPlanet : window := (lRow => 14, lCol => 58, sRow => 12, sCol => 20, title => Ada.Strings.Unbounded.To_Unbounded_String("Planets"));
+   wEnemy  : window := (lRow =>  1, lCol => 75, sRow => 12, sCol => 20, title => Ada.Strings.Unbounded.To_Unbounded_String("Enemies"));
+   wMsg    : window;
    --
    --  For messages
    --
@@ -83,6 +85,13 @@ package screen is
    --  Draw the enemies window
    --
    procedure draw_enemy(w : window);
+   --
+   --  Draw a message window
+   --
+   --  This window will be drawn on top of other windows and will wait to be
+   --  dismissed until the user hits return.
+   --
+   procedure draw_msg(m : Ada.Strings.Unbounded.Unbounded_String);
 private
    --
    --  Utility function to write sector position on screen
@@ -91,5 +100,5 @@ private
    --
    --  Draw a window frame and title
    --
-   procedure frame(w : window; t : String);
+   procedure frame(w : window);
 end screen;

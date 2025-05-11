@@ -44,16 +44,16 @@ package body cli is
          --
          if data.ship.energy = 0 then
             Ada.Text_IO.Put_Line("Your ship has been destroyed.  The game is over." & BBS.ANSI.rst);
-            Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
-            Ada.Text_IO.Put_Line("Total planets destroyed: " & Natural'Image(data.planets_destr));
-            Ada.Text_IO.Put_Line("Total bases destroyed:   " & Natural'Image(data.bases_destr));
+--            Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
+--            Ada.Text_IO.Put_Line("Total planets destroyed: " & Natural'Image(data.planets_destr));
+--            Ada.Text_IO.Put_Line("Total bases destroyed:   " & Natural'Image(data.bases_destr));
             exit;
          end if;
          if data.enemies_remain = 0 then
             Ada.Text_IO.Put_Line("All enemies have been destroyed.  You have won." & BBS.ANSI.rst);
-            Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
-            Ada.Text_IO.Put_Line("Total planets destroyed: " & Natural'Image(data.planets_destr));
-            Ada.Text_IO.Put_Line("Total bases destroyed:   " & Natural'Image(data.bases_destr));
+--            Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
+--            Ada.Text_IO.Put_Line("Total planets destroyed: " & Natural'Image(data.planets_destr));
+--            Ada.Text_IO.Put_Line("Total bases destroyed:   " & Natural'Image(data.bases_destr));
             exit;
          end if;
          --
@@ -109,12 +109,16 @@ package body cli is
          elsif first = "SHIELDS" then
             shields(rest);
          elsif first = "QUIT" then
-            Ada.Text_IO.Put_Line(BBS.ANSI.rst);
-            return;
+            Ada.Text_IO.Put_Line("You have quit the game, neither won nor lost.");
+            exit;
          else
             cas.set_msg(cas.cmd_unknown, cas.info, True);
          end if;
       end loop;
+      Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
+      Ada.Text_IO.Put_Line("Total planets destroyed: " & Natural'Image(data.planets_destr));
+      Ada.Text_IO.Put_Line("Total bases destroyed:   " & Natural'Image(data.bases_destr));
+      Ada.Text_IO.Put_Line(BBS.ANSI.rst);
    end;
    --
    --  Split on whitespace.  String is passed in in "rest".  The next
