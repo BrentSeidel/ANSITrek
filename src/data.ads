@@ -101,8 +101,11 @@ package data is
    --
    --  Galaxy data
    --
-   u             : lr_galaxy;
-   total_enemies : Natural;
+   u              : lr_galaxy;
+   enemies_remain : Natural;
+   enemies_killed : Natural;
+   planets_destr  : Natural;
+   bases_destr    : Natural;
    --
    --  Sector data
    --

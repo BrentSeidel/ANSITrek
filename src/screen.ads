@@ -30,26 +30,23 @@ package screen is
       col : Natural;
    end record;
    --
+   type window is record
+      lRow : Natural;  --  Location row
+      lCol : Natural;  --  Location column
+      sRow : Natural;  --  Size in rows
+      sCol : Natural;  --  Size in columns
+   end record;
+   --
    --  Values for locations and sizes
    --
    screen_size : size;
-   ship_pos  : location := (row => 13, col => 1);
-   ship_size : size := (row => 10, col => 15);
    --
-   sect_pos  : location := (row => 1, col => 1);
-   sect_size : size := (row => 11, col => 21);
-   --
-   univ_pos  : location := (row => 1, col => 23);
-   univ_size : size := (row => 11, col => 51);
-   --
-   cas_pos  : location := (row => 13, col => 17);
-   cas_size : size := (row => 10, col => 40);
-   --
-   planet_pos  : location := (row => 14, col => 58);
-   planet_size : size := (row => 12, col => 20);
-   --
-   enemy_pos  : location := (row => 1, col => 75);
-   enemy_size : size := (row => 12, col => 20);
+   wShip   : window := (lRow => 13, lCol =>  1, sRow => 10, sCol => 15);
+   wSect   : window := (lRow =>  1, lCol =>  1, sRow => 11, sCol => 21);
+   wUniv   : window := (lRow =>  1, lCol => 23, sRow => 11, sCol => 51);
+   wCas    : window := (lRow => 13, lCol => 17, sRow => 10, sCol => 40);
+   wPlanet : window := (lRow => 14, lCol => 58, sRow => 12, sCol => 20);
+   wEnemy  : window := (lRow =>  1, lCol => 75, sRow => 12, sCol => 20);
    --
    --  For messages
    --
@@ -65,27 +62,27 @@ package screen is
    --
    --  Draw ship state
    --
-   procedure draw_ship;
+   procedure draw_ship(w : window);
    --
    --  Draw the sector map
    --
-   procedure draw_sect;
+   procedure draw_sect(w : window);
    --
    --  Draw the galaxy map
    --
-   procedure draw_univ;
+   procedure draw_univ(w : window);
    --
    --  Draw the CAS window
    --
-   procedure draw_cas;
+   procedure draw_cas(w : window);
    --
    --  Draw the planets window
    --
-   procedure draw_planet;
+   procedure draw_planet(w : window);
    --
    --  Draw the enemies window
    --
-   procedure draw_enemy;
+   procedure draw_enemy(w : window);
 private
    --
    --  Utility function to write sector position on screen
@@ -94,5 +91,5 @@ private
    --
    --  Draw a window frame and title
    --
-   procedure frame(p : location; s : size; t : String);
+   procedure frame(w : window; t : String);
 end screen;

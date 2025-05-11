@@ -44,10 +44,16 @@ package body cli is
          --
          if data.ship.energy = 0 then
             Ada.Text_IO.Put_Line("Your ship has been destroyed.  The game is over." & BBS.ANSI.rst);
+            Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
+            Ada.Text_IO.Put_Line("Total planets destroyed: " & Natural'Image(data.planets_destr));
+            Ada.Text_IO.Put_Line("Total bases destroyed:   " & Natural'Image(data.bases_destr));
             exit;
          end if;
-         if data.total_enemies = 0 then
+         if data.enemies_remain = 0 then
             Ada.Text_IO.Put_Line("All enemies have been destroyed.  You have won." & BBS.ANSI.rst);
+            Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
+            Ada.Text_IO.Put_Line("Total planets destroyed: " & Natural'Image(data.planets_destr));
+            Ada.Text_IO.Put_Line("Total bases destroyed:   " & Natural'Image(data.bases_destr));
             exit;
          end if;
          --
@@ -267,6 +273,7 @@ package body cli is
          elsif target = data.base then
             cas.set_msg(cas.dest_base, cas.alert, True);
             data.u(lr.x, lr.y).base := False;
+            data.bases_destr := data.bases_destr + 1;
             if data.ship.loc = data.docked then
                data.ship.loc := data.space;
             end if;

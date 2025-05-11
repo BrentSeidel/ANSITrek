@@ -31,17 +31,20 @@ package body data is
       init_ship;
       init_lr;
       init_sr(ship.pos_lr.x, ship.pos_lr.y);
+      enemies_killed := 0;
+      planets_destr  := 0;
+      bases_destr    := 0;
    end;
    --
    procedure init_lr is
       lr : lr_data;
    begin
-      total_enemies := 0;
+      enemies_remain := 0;
       for i in galaxy_size'Range loop
          for j in galaxy_size'Range loop
             lr.stars   := rnd_star.Random(g1);
             lr.enemies := rnd_enem.Random(g2);
-            total_enemies := total_enemies + lr.enemies;
+            enemies_remain := enemies_remain + lr.enemies;
             lr.planets := rnd_planet.Random(g3);
             lr.base    := True;
             lr.destroyed := False;
@@ -151,6 +154,7 @@ package body data is
             data.u(lr.x, lr.y).planets := data.u(lr.x, lr.y).planets - 1;
             planets(i).destr := True;
             planets(i).fuel := 0;
+            planets_destr := planets_destr + 1;
             return;
          end if;
       end loop;
@@ -174,7 +178,8 @@ package body data is
             if e >= enemies(i).energy then
                cas.set_msg(cas.dest_enemy1, cas.alert, True);
                data.u(lr.x, lr.y).enemies := data.u(lr.x, lr.y).enemies - 1;
-               total_enemies := total_enemies - 1;
+               enemies_remain := enemies_remain - 1;
+               enemies_killed := enemies_killed + 1;
                sect(p.x, p.y) := empty;
                enemies(i).destr := True;
                enemies(i).energy := 0;

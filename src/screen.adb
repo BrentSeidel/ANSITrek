@@ -52,21 +52,21 @@ package body screen is
    procedure redraw is
    begin
       Ada.Text_IO.Put(BBS.ANSI.cls);
-      draw_sect;
-      draw_univ;
-      draw_ship;
-      draw_cas;
-      draw_planet;
-      draw_enemy;
+      draw_sect(wSect);
+      draw_univ(wUniv);
+      draw_ship(wShip);
+      draw_cas(wCas);
+      draw_planet(wPlanet);
+      draw_enemy(wEnemy);
    end;
    --
    --  Draw ship state
    --
-   procedure draw_ship is
+   procedure draw_ship(w : window) is
    begin
-      frame(ship_pos, ship_size, "Ship");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 1, ship_pos.col + 1) & "Status");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 1, ship_pos.col + 8));
+      frame(w, "Ship");
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 1, w.lCol + 1) & "Status");
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 1, w.lCol + 8));
       case data.ship.status is
          when data.blue =>
             Ada.Text_IO.Put(BBS.ANSI.blue    & "   BLUE");
@@ -83,22 +83,22 @@ package body screen is
       end case;
       Ada.Text_IO.Put(BBS.ANSI.white);
       --
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 2, ship_pos.col + 1) & "Sector");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 2, ship_pos.col + 10));
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 2, w.lCol + 1) & "Sector");
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 2, w.lCol + 10));
       univ_io.Put(data.ship.pos_lr.x, width => 2, base => 10);
       Ada.Text_IO.Put(",");
       univ_io.Put(data.ship.pos_lr.y, width => 2, base => 10);
       --
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 3, ship_pos.col + 1) & "Position");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 3, ship_pos.col + 10));
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 3, w.lCol + 1) & "Position");
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 3, w.lCol + 10));
       sr_put_pos(data.ship.pos_sr);
       --
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 4, ship_pos.col + 1) & "Energy");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 4, ship_pos.col + 9));
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 4, w.lCol + 1) & "Energy");
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 4, w.lCol + 9));
       nat_io.Put(data.ship.energy, width => 6, base => 10);
       --
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 5, ship_pos.col + 1) & "Shields");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 5, ship_pos.col + 8));
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 5, w.lCol + 1) & "Shields");
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 5, w.lCol + 8));
       nat_io.Put(data.ship.shield, width => 6, base => 10);
       if data.ship.shields then
          Ada.Text_IO.Put(BBS.ANSI.green & "U");
@@ -107,26 +107,26 @@ package body screen is
       end if;
       Ada.Text_IO.Put(BBS.ANSI.white);
       --
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 6, ship_pos.col + 1) & "Torpedos");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 6, ship_pos.col + 9));
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 6, w.lCol + 1) & "Torpedos");
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 6, w.lCol + 9));
       nat_io.Put(data.ship.torpedo, width => 6, base => 10);
       --
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 7, ship_pos.col + 1) & "Time");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 7, ship_pos.col + 9));
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 7, w.lCol + 1) & "Time");
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 7, w.lCol + 9));
       nat_io.Put(data.ship.elapsed, width => 6, base => 10);
       --
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 8, ship_pos.col + 1) & "Crew");
-      Ada.Text_IO.Put(BBS.ANSI.posCursor(ship_pos.row + 8, ship_pos.col + 9));
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 8, w.lCol + 1) & "Crew");
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + 8, w.lCol + 9));
       nat_io.Put(data.ship.crew, width => 6, base => 10);
    end;
    --
    --  Draw the sector map
    --
-   procedure draw_sect is
+   procedure draw_sect(w : window) is
    begin
-      frame(sect_pos, sect_size, "Sector");
+      frame(w, "Sector");
       for i in data.sector_size'Range loop
-         Ada.Text_IO.Put(BBS.ANSI.posCursor(sect_pos.row + Natural(i), sect_pos.col + 1));
+         Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + Natural(i), w.lCol + 1));
          for j in data.sector_size'Range loop
             case data.sect(j, i) is
                when data.empty =>
@@ -152,12 +152,12 @@ package body screen is
    --
    --  Draw the galaxy map
    --
-   procedure draw_univ is
+   procedure draw_univ(w : window) is
       sect : data.lr_data;
    begin
-      frame(univ_pos, univ_size, "Galaxy");
+      frame(w, "Galaxy");
       for i in data.galaxy_size'Range loop
-         Ada.Text_IO.Put(BBS.ANSI.posCursor(univ_pos.row + Natural(i), univ_pos.col + 1));
+         Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + Natural(i), w.lCol + 1));
          for j in data.galaxy_size'Range loop
             if (j = data.ship.pos_lr.x) and (i = data.ship.pos_lr.y) then
                Ada.Text_IO.Put("[");
@@ -197,18 +197,18 @@ package body screen is
    --
    --  Draw the CAS window
    --
-   procedure draw_cas is
+   procedure draw_cas(w : window) is
       line : Natural := 1;
    begin
-      frame(cas_pos, cas_size, "Messages");
+      frame(w, "Messages");
       --
       --  Alerts first
       --
       Ada.Text_IO.Put(BBS.ANSI.red);
       for m in cas.messages loop
-         exit when line > cas_size.row;
+         exit when line > w.sRow;
          if cas.msg_list(m).active and (cas.msg_list(m).priority = cas.alert) then
-            Ada.Text_IO.Put(BBS.ANSI.posCursor(cas_pos.row + line, cas_pos.col + 1));
+            Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + line, w.lCol + 1));
             Ada.Text_IO.Put(cas.msg_text(m));
             line := line + 1;
          end if;
@@ -218,9 +218,9 @@ package body screen is
       --
       Ada.Text_IO.Put(BBS.ANSI.yellow);
       for m in cas.messages loop
-         exit when line > cas_size.row;
+         exit when line > w.sRow;
          if cas.msg_list(m).active and (cas.msg_list(m).priority = cas.warning) then
-            Ada.Text_IO.Put(BBS.ANSI.posCursor(cas_pos.row + line, cas_pos.col + 1));
+            Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + line, w.lCol + 1));
             Ada.Text_IO.Put(cas.msg_text(m));
             line := line + 1;
          end if;
@@ -230,9 +230,9 @@ package body screen is
       --
       Ada.Text_IO.Put(BBS.ANSI.white);
       for m in cas.messages loop
-         exit when line > cas_size.row;
+         exit when line > w.sRow;
          if cas.msg_list(m).active and (cas.msg_list(m).priority = cas.info) then
-            Ada.Text_IO.Put(BBS.ANSI.posCursor(cas_pos.row + line, cas_pos.col + 1));
+            Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + line, w.lCol + 1));
             Ada.Text_IO.Put(cas.msg_text(m));
             line := line + 1;
          end if;
@@ -241,11 +241,11 @@ package body screen is
    --
    --  Draw the planets window
    --
-   procedure draw_planet is
+   procedure draw_planet(w : window) is
    begin
-      frame(planet_pos, planet_size, "Planets");
+      frame(w, "Planets");
       for i in 1 .. data.planet_count loop
-         Ada.Text_IO.Put(BBS.ANSI.posCursor(planet_pos.row + i, planet_pos.col + 1));
+         Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + i, w.lCol + 1));
          if data.planets(i).destr then
             Ada.Text_IO.Put_Line(BBS.ANSI.red & "Destroyed" & BBS.ANSI.white);
          else
@@ -258,11 +258,11 @@ package body screen is
    --
    --  Draw the enemies window
    --
-   procedure draw_enemy is
+   procedure draw_enemy(w : window) is
    begin
-      frame(enemy_pos, enemy_size, "Enemies");
+      frame(w, "Enemies");
       for i in 1 .. data.enemy_count loop
-         Ada.Text_IO.Put(BBS.ANSI.posCursor(enemy_pos.row + i, enemy_pos.col + 1));
+         Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + i, w.lCol + 1));
          if data.enemies(i).destr then
             Ada.Text_IO.Put_Line(BBS.ANSI.red & "Destroyed" & BBS.ANSI.white);
          else
@@ -292,13 +292,13 @@ package body screen is
    --
    --  Draw a window frame and title
    --
-   procedure frame(p : location; s : size; t : String) is
+   procedure frame(w : window; t : String) is
       len : Natural := t'Length;
-      r   : Natural := p.row;
-      c   : Natural := (s.col - len)/2 + p.col;
+      r   : Natural := w.lRow;
+      c   : Natural := (w.sCol - len)/2 + w.lCol;
    begin
       Ada.Text_IO.Put(BBS.ANSI.so);
-      Ada.Text_IO.Put(BBS.ANSI.drawBox(p.row, p.col, s.row, s.col, True));
+      Ada.Text_IO.Put(BBS.ANSI.drawBox(w.lRow, w.lCol, w.sRow, w.sCol, True));
       Ada.Text_IO.Put(BBS.ANSI.si);
       Ada.Text_IO.Put(BBS.ANSI.posCursor(r, c) & t);
    end;
