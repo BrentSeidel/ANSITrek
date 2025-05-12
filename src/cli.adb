@@ -44,16 +44,10 @@ package body cli is
          --
          if data.ship.energy = 0 then
             Ada.Text_IO.Put_Line("Your ship has been destroyed.  The game is over." & BBS.ANSI.rst);
---            Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
---            Ada.Text_IO.Put_Line("Total planets destroyed: " & Natural'Image(data.planets_destr));
---            Ada.Text_IO.Put_Line("Total bases destroyed:   " & Natural'Image(data.bases_destr));
             exit;
          end if;
          if data.enemies_remain = 0 then
             Ada.Text_IO.Put_Line("All enemies have been destroyed.  You have won." & BBS.ANSI.rst);
---            Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
---            Ada.Text_IO.Put_Line("Total planets destroyed: " & Natural'Image(data.planets_destr));
---            Ada.Text_IO.Put_Line("Total bases destroyed:   " & Natural'Image(data.bases_destr));
             exit;
          end if;
          --
@@ -106,13 +100,19 @@ package body cli is
             orbit;
          elsif first = "TORP" then
             torpedo(rest);
+         elsif first = "SCAN" then
+            if data.ship.loc = data.orbit then
+               screen.draw_msg("Scanning planet");
+            else
+               screen.draw_msg("Unable to scan planet while not in orbit around planet");
+            end if;
          elsif first = "SHIELDS" then
             shields(rest);
          elsif first = "QUIT" then
             Ada.Text_IO.Put_Line("You have quit the game, neither won nor lost.");
             exit;
          else
-            cas.set_msg(cas.cmd_unknown, cas.info, True);
+            screen.draw_msg("Unrecognized command <" & Ada.Strings.Unbounded.To_String(first) & ">");
          end if;
       end loop;
       Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
@@ -236,7 +236,7 @@ package body cli is
       if check_adjacent(data.base) then
          data.ship.loc := data.docked;
       else
-         cas.set_msg(cas.no_dock, cas.warning, True);
+         screen.draw_msg("You need to be adjacent to a base to dock");
       end if;
    end;
    --
@@ -251,7 +251,7 @@ package body cli is
       if check_adjacent(data.planet) then
          data.ship.loc := data.orbit;
       else
-         cas.set_msg(cas.no_orbit, cas.warning, True);
+         screen.draw_msg("You need to be adjacent to a planet to orbit");
       end if;
    end;
    --
@@ -315,9 +315,12 @@ package body cli is
          if (temp >= 0) and (temp < data.ship.energy) then
             data.ship.shield := Natural(temp);
          else
-            cas.set_msg(cas.invalid, cas.info, True);
+            screen.draw_msg("Shield value out of range");
          end if;
       end if;
+   exception
+      when others =>
+         screen.draw_msg("Can't set shields to " & Ada.Strings.Unbounded.To_String(first));
    end;
    --
    function get_galaxy_coords(r : Ada.Strings.Unbounded.Unbounded_String; v : out Boolean) return data.lr_pos is
@@ -332,7 +335,7 @@ package body cli is
       if (temp >= Integer(data.galaxy_size'First)) and (temp <= Integer(data.galaxy_size'Last)) then
          pos.x := data.galaxy_size(temp);
       else
-         cas.set_msg(cas.invalid, cas.info, True);
+         screen.draw_msg("Galaxy first coordinate out of range");
          v := False;
          return pos;
       end if;
@@ -341,14 +344,14 @@ package body cli is
       if (temp >= Integer(data.galaxy_size'First)) and (temp <= Integer(data.galaxy_size'Last)) then
          pos.y := data.galaxy_size(temp);
       else
-         cas.set_msg(cas.invalid, cas.info, True);
+         screen.draw_msg("Galaxy second coordinate out of range");
          v := False;
          return pos;
       end if;
       return pos;
    exception
       when others =>
-         cas.set_msg(cas.invalid, cas.info, True);
+         screen.draw_msg("Invalid galaxy coordinates provided.");
          v := False;
          return pos;
    end;
@@ -365,7 +368,7 @@ package body cli is
       if (temp >= Integer(data.sector_size'First)) and (temp <= Integer(data.sector_size'Last)) then
          pos.x := data.sector_size(temp);
       else
-         cas.set_msg(cas.invalid, cas.info, True);
+         screen.draw_msg("Sector first coordinate out of range");
          v := False;
          return pos;
       end if;
@@ -374,14 +377,14 @@ package body cli is
       if (temp >= Integer(data.sector_size'First)) and (temp <= Integer(data.sector_size'Last)) then
          pos.y := data.sector_size(temp);
       else
-         cas.set_msg(cas.invalid, cas.info, True);
+         screen.draw_msg("Sector second coordinate out of range");
          v := False;
          return pos;
       end if;
       return pos;
    exception
       when others =>
-         cas.set_msg(cas.invalid, cas.info, True);
+         screen.draw_msg("Invalid sector coordinates provided.");
          v := False;
          return pos;
    end;

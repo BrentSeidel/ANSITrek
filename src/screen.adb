@@ -283,12 +283,25 @@ package body screen is
    --
    --  Draw a message window
    --
-   procedure draw_msg(m : Ada.Strings.Unbounded.Unbounded_String) is
-      lMsg   : Natural := Ada.Strings.Unbounded.Length(m);
+   --  For now, this supports a single line message less than the screen width.
+   --  The intent is to eventually implement text wrapping and allow multiline
+   --  messages.
+   --
+   procedure draw_msg(m : String) is
+      temp   : Ada.Strings.Unbounded.Unbounded_String;
+      lMsg   : Natural := m'Length;
       lTitle : Natural;
    begin
       wMsg.title := Ada.Strings.Unbounded.To_Unbounded_String("Message");
       lTitle := Ada.Strings.Unbounded.Length(wMsg.title);
+      wMsg.sCol := lMsg + 1;
+      wMsg.sRow := 2;
+      wMsg.lCol := (screen_size.col - wMsg.sCol)/2;
+      wMsg.lRow := (screen_size.row - wMsg.sRow)/2;
+      frame(wMsg);
+      Ada.Text_IO.Put(BBS.ANSI.posCursor(wMsg.lRow + 1, wMsg.lCol + 1));
+      Ada.Text_IO.Put(m);
+      Ada.Text_IO.Unbounded_IO.Get_Line(temp);
    end;
    --
    --  Utility function to write sector position on screen

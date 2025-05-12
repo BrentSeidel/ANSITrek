@@ -24,11 +24,8 @@ package body cas is
    begin
       msg_list(enemies).text     := msg_enemies'Access;
       msg_list(power).text       := msg_power'Access;
-      msg_list(cmd_unknown).text := msg_cmd_unknown'Access;
       msg_list(docked).text      := msg_docked'Access;
-      msg_list(no_dock).text     := msg_no_dock'Access;
       msg_list(in_orbit).text    := msg_in_orbit'Access;
-      msg_list(no_orbit).text    := msg_no_orbit'Access;
       msg_list(no_torp).text     := msg_no_torp'Access;
       msg_list(occupied).text    := msg_occupied'Access;
       msg_list(dest_self).text   := msg_dest_self'Access;
@@ -39,7 +36,6 @@ package body cas is
       msg_list(dest_empty).text  := msg_dest_empty'Access;
       msg_list(internal).text    := msg_internal'Access;
       msg_list(target_hit).text  := msg_target_hit'Access;
-      msg_list(invalid).text     := msg_invalid'Access;
       msg_list(attack).text      := msg_attack'Access;
    end;
    --

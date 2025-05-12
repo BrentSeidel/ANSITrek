@@ -17,6 +17,7 @@
 --  with ANSI Trek. If not, see <https://www.gnu.org/licenses/>.
 --
 with Ada.Strings.Unbounded;
+with Ada.Text_IO.Unbounded_IO;
 with data;
 package screen is
    --
@@ -91,7 +92,7 @@ package screen is
    --  This window will be drawn on top of other windows and will wait to be
    --  dismissed until the user hits return.
    --
-   procedure draw_msg(m : Ada.Strings.Unbounded.Unbounded_String);
+   procedure draw_msg(m : String);
 private
    --
    --  Utility function to write sector position on screen

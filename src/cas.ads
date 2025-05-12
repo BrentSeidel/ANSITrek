@@ -20,9 +20,9 @@ package cas is
    --
    --  Enumeration for messages
    --
-   type messages is (enemies, power, cmd_unknown, docked, no_dock, in_orbit,
-                     no_orbit, no_torp, occupied, dest_self, dest_base, dest_planet,
-                     dest_star, dest_enemy1, dest_empty, internal, target_hit, invalid,
+   type messages is (enemies, power, docked, in_orbit,
+                     no_torp, occupied, dest_self, dest_base, dest_planet,
+                     dest_star, dest_enemy1, dest_empty, internal, target_hit,
                      attack);
    --
    --  Enumeration for message priorities
@@ -56,11 +56,8 @@ private
    --
    msg_enemies     : aliased constant String := "Enemies detected in sector";
    msg_power       : aliased constant String := "Power is low";
-   msg_cmd_unknown : aliased constant String := "Unknown command";
    msg_docked      : aliased constant String := "Docked to starbase";
-   msg_no_dock     : aliased constant String := "Ship not adjacent to starbase";
    msg_in_orbit    : aliased constant String := "In orbit around a planet";
-   msg_no_orbit    : aliased constant String := "Ship not adjacent to planet";
    msg_no_torp     : aliased constant String := "No torpedos to launch";
    msg_occupied    : aliased constant String := "Destination occupied";
    msg_dest_self   : aliased constant String := "You have destroyed yourself";
@@ -71,6 +68,5 @@ private
    msg_dest_empty  : aliased constant String := "A brief star shone in the blackness";
    msg_internal    : aliased constant String := "An internal program error occured";
    msg_target_hit  : aliased constant String := "Target hit";
-   msg_invalid     : aliased constant String := "Invalid command";
    msg_attack      : aliased constant String := "You have been attacked";
 end cas;
