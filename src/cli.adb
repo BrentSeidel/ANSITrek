@@ -101,11 +101,7 @@ package body cli is
          elsif first = "TORP" then
             torpedo(rest);
          elsif first = "SCAN" then
-            if data.ship.loc = data.orbit then
-               screen.draw_msg("Scanning planet");
-            else
-               screen.draw_msg("Unable to scan planet while not in orbit around planet");
-            end if;
+            scan_planet;
          elsif first = "SHIELDS" then
             shields(rest);
          elsif first = "QUIT" then
@@ -201,6 +197,7 @@ package body cli is
             data.ship.pos_sr := pos;
             data.sect(pos.x, pos.y) := data.self;
             data.ship.loc := data.space;
+            data.ship.orbit := 0;
          else
             cas.set_msg(cas.occupied, cas.info, True);
          end if;
@@ -244,14 +241,40 @@ package body cli is
    --
    procedure orbit is
       pos : data.sr_pos := data.ship.pos_sr;
+      l   : data.item_list;
+      c   : Natural;
    begin
       --
       --  If adjacent to planet then orbit
       --
-      if check_adjacent(data.planet) then
+      l := data.adjacent_planet(data.ship.pos_sr, c);
+      if c > 0 then
          data.ship.loc := data.orbit;
+         data.ship.orbit := l(1);
       else
          screen.draw_msg("You need to be adjacent to a planet to orbit");
+      end if;
+   end;
+   --
+   --  Scan a planet
+   --
+   procedure scan_planet is
+      pos : data.sr_pos := data.ship.pos_sr;
+      dist_x : Integer;
+      dist_y : Integer;
+   begin
+      --
+      --  If adjacent to planet then scan
+      --
+      for i in 1 .. data.planet_count loop
+         dist_x := Integer(data.ship.pos_sr.x) - Integer(data.planets(i).pos.x);
+         dist_y := Integer(data.ship.pos_sr.y) - Integer(data.planets(i).pos.y);
+         if (not data.planets(i).destr) and ((abs dist_x) <= data.scan_range) and ((abs dist_y) <= data.scan_range) then
+            data.planets(i).scanned := True;
+         end if;
+      end loop;
+      if not check_adjacent(data.planet) then
+         screen.draw_msg("You need to be adjacent to a planet to scan it");
       end if;
    end;
    --

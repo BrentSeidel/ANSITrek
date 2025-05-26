@@ -51,6 +51,7 @@ package cli is
    procedure jump(r : Ada.Strings.Unbounded.Unbounded_String);
    procedure dock;
    procedure orbit;
+   procedure scan_planet;
    procedure torpedo(r : Ada.Strings.Unbounded.Unbounded_String);
    procedure shields(r : Ada.Strings.Unbounded.Unbounded_String);
    --

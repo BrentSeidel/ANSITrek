@@ -74,6 +74,7 @@ package data is
       elapsed : Natural;
       loc     : Location;
       crew    : Natural;
+      orbit   : Natural;
    end record;
    --
    --  Enemy data
@@ -89,11 +90,14 @@ package data is
    --  Planet resources
    --
    type planet_state is record
-      pos   : sr_pos;
-      fuel  : Natural;
-      destr : Boolean;
+      pos     : sr_pos;
+      fuel    : Natural;
+      scanned : Boolean;
+      destr   : Boolean;
    end record;
    type planet_list is array (1 .. 10) of planet_state;
+   --
+   type item_list is array(1 .. 10) of Natural;
    --
    --  Main data structures
    --
@@ -125,6 +129,7 @@ package data is
    full_crew   : constant Natural := 500;
    full_torp   : constant Natural := 20;
    torp_energy : constant Natural := 1000;
+   scan_range  : constant Natural := 1;
    --
    --  Routines
    --
@@ -143,6 +148,10 @@ package data is
    --  Compute attackes from all enemies on ship
    --
    procedure attack_ship;
+   --
+   --  Find items
+   --
+   function adjacent_planet(p : sr_pos; c : out Natural) return item_list;
    --
 private
    --

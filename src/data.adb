@@ -18,6 +18,7 @@
 --
 with Ada.Text_IO;
 with cas;
+with screen;
 package body data is
    --
    procedure init is
@@ -88,9 +89,10 @@ package body data is
             y1 := rnd_sect.Random(g5);
          end loop;
          sect(x1, y1) := planet;
-         planets(index).pos := (x1, y1);
-         planets(index).fuel := Natural(Ada.Numerics.Float_Random.Random(g6)*100.0);
-         planets(index).destr := False;
+         planets(index).pos     := (x1, y1);
+         planets(index).fuel    := Natural(Ada.Numerics.Float_Random.Random(g6)*100.0);
+         planets(index).destr   := False;
+         planets(index).scanned := False;
          index := index + 1;
       end loop;
       --
@@ -131,6 +133,7 @@ package body data is
       ship.elapsed := 0;
       ship.crew    := full_crew;
       ship.loc     := space;
+      ship.orbit   := 0;
    end;
    --
    --  Utility functions
@@ -155,6 +158,11 @@ package body data is
             planets(i).destr := True;
             planets(i).fuel := 0;
             planets_destr := planets_destr + 1;
+            if ship.orbit = 1 then
+               ship.orbit := 0;
+               ship.loc   := space;
+               screen.draw_msg("You destroyed the planet that you're orbiting!");
+            end if;
             return;
          end if;
       end loop;
@@ -233,6 +241,26 @@ package body data is
             end if;
          end if;
       end loop;
+   end;
+   --
+   --  Find items
+   --
+   function adjacent_planet(p : sr_pos; c : out Natural) return item_list is
+      count  : Natural := 0;
+      dist_x : Integer;
+      dist_y : Integer;
+      list   : item_list := (others => 0);
+   begin
+      for i in 1 .. planet_count loop
+         dist_x := Integer(p.x) - Integer(planets(i).pos.x);
+         dist_y := Integer(p.y) - Integer(planets(i).pos.y);
+         if (not planets(i).destr) and ((abs dist_x) <= 1) and ((abs dist_y) <= 1) then
+            count := count + 1;
+            list(count) := i;
+         end if;
+      end loop;
+      c := count;
+      return list;
    end;
    --
 end data;

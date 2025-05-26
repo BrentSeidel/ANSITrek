@@ -247,11 +247,21 @@ package body screen is
       for i in 1 .. data.planet_count loop
          Ada.Text_IO.Put(BBS.ANSI.posCursor(w.lRow + i, w.lCol + 1));
          if data.planets(i).destr then
-            Ada.Text_IO.Put_Line(BBS.ANSI.red & "Destroyed" & BBS.ANSI.white);
+            Ada.Text_IO.Put(BBS.ANSI.red & "Destroyed" & BBS.ANSI.white);
          else
+            if data.ship.orbit = i then
+               Ada.Text_IO.Put(BBS.ANSI.green);
+            end if;
             sr_put_pos(data.planets(i).pos);
+            if data.ship.orbit = i then
+               Ada.Text_IO.Put(BBS.ANSI.white);
+            end if;
             Ada.Text_IO.Put("  ");
-            nat_io.Put(data.planets(i).fuel, width => 4, base => 10);
+            if data.planets(i).scanned then
+               nat_io.Put(data.planets(i).fuel, width => 4, base => 10);
+            else
+               Ada.Text_IO.Put(" ---");
+            end if;
          end if;
       end loop;
    end;
