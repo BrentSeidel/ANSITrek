@@ -230,7 +230,7 @@ package body cli is
       --
       --  If adjacent to star base then do docking process
       --
-      if check_adjacent(data.base) then
+      if data.check_adjacent(data.base) then
          data.ship.loc := data.docked;
       else
          screen.draw_msg("You need to be adjacent to a base to dock");
@@ -262,6 +262,7 @@ package body cli is
       pos : data.sr_pos := data.ship.pos_sr;
       dist_x : Integer;
       dist_y : Integer;
+      scan_count : Natural := 0;
    begin
       --
       --  If adjacent to planet then scan
@@ -271,9 +272,10 @@ package body cli is
          dist_y := Integer(data.ship.pos_sr.y) - Integer(data.planets(i).pos.y);
          if (not data.planets(i).destr) and ((abs dist_x) <= data.scan_range) and ((abs dist_y) <= data.scan_range) then
             data.planets(i).scanned := True;
+            scan_count := scan_count + 1;
          end if;
       end loop;
-      if not check_adjacent(data.planet) then
+      if scan_count = 0 then
          screen.draw_msg("You need to be adjacent to a planet to scan it");
       end if;
    end;
@@ -431,53 +433,5 @@ package body cli is
          cas.clear_msg(cas.in_orbit);
          cas.clear_msg(cas.docked);
       end if;
-   end;
-   --
-   --  Check if ship is adjacent to object of type o.
-   --
-   function check_adjacent(o : data.sr_data) return Boolean is
-      pos : data.sr_pos := data.ship.pos_sr;
-   begin
-      if pos.x > data.sector_size'First then
-         if pos.y > data.sector_size'First then
-            if data.sect(pos.x - 1, pos.y - 1) = o then
-               return True;
-            end if;
-         end if;
-         if data.sect(pos.x - 1, pos.y) = o then
-           return True;
-         end if;
-         if pos.y < data.sector_size'Last then
-            if data.sect(pos.x - 1, pos.y + 1) = o then
-               return True;
-            end if;
-         end if;
-      end if;
-      if pos.y > data.sector_size'First then
-         if data.sect(pos.x, pos.y - 1) = o then
-            return True;
-         end if;
-      end if;
-      if pos.y < data.sector_size'Last then
-         if data.sect(pos.x, pos.y + 1) = o then
-            return True;
-         end if;
-      end if;
-      if pos.x < data.sector_size'Last then
-         if pos.y > data.sector_size'First then
-            if data.sect(pos.x + 1, pos.y - 1) = o then
-               return True;
-            end if;
-         end if;
-         if data.sect(pos.x + 1, pos.y) = o then
-            return True;
-         end if;
-         if pos.y < data.sector_size'Last then
-            if data.sect(pos.x + 1, pos.y + 1) = o then
-               return True;
-            end if;
-         end if;
-      end if;
-      return False;
    end;
 end cli;

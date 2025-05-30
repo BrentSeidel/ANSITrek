@@ -68,8 +68,4 @@ private
          Character'Val(10) & Character'Val(11) & Character'Val(12) & Character'Val(13));
    --
    blackspace : constant Ada.Strings.Maps.Character_Set := not whitespace;
-   --
-   --  Check if ship is adjacent to object of type o.
-   --
-   function check_adjacent(o : data.sr_data) return Boolean;
 end cli;

@@ -138,10 +138,11 @@ package body data is
    --
    --  Utility functions
    --
-   --  Destroy the planet at the specified location
+   --  Attack the planet at the specified location
    --
    procedure attack_planet(p : sr_pos; e : Natural) is
-      lr : data.lr_pos := data.ship.pos_lr;
+      lr : lr_pos := ship.pos_lr;
+      sr : sr_pos := ship.pos_sr;
    begin
       if sect(p.x, p.y) /= planet then
          cas.set_msg(cas.internal, cas.alert, True);
@@ -154,11 +155,14 @@ package body data is
          if (planets(i).pos.x = p.x) and (planets(i).pos.y = p.y) then
             sect(p.x, p.y) := empty;
             cas.set_msg(cas.dest_planet, cas.alert, True);
-            data.u(lr.x, lr.y).planets := data.u(lr.x, lr.y).planets - 1;
+            u(lr.x, lr.y).planets := u(lr.x, lr.y).planets - 1;
             planets(i).destr := True;
             planets(i).fuel := 0;
             planets_destr := planets_destr + 1;
-            if ship.orbit = 1 then
+            --
+            --  Check if ship is in orbit around this planet.
+            --
+            if (ship.orbit = i) then
                ship.orbit := 0;
                ship.loc   := space;
                screen.draw_msg("You destroyed the planet that you're orbiting!");
@@ -169,10 +173,10 @@ package body data is
       cas.set_msg(cas.internal, cas.alert, True);
    end;
    --
-   --  Destroy an enemy at the specified location
+   --  Attack an enemy at the specified location
    --
    procedure attack_enemy(p : sr_pos; e : Natural) is
-      lr : data.lr_pos := data.ship.pos_lr;
+      lr : lr_pos := ship.pos_lr;
    begin
       if sect(p.x, p.y) /= enemy1 then
          cas.set_msg(cas.internal, cas.alert, True);
@@ -247,20 +251,91 @@ package body data is
    --
    function adjacent_planet(p : sr_pos; c : out Natural) return item_list is
       count  : Natural := 0;
-      dist_x : Integer;
-      dist_y : Integer;
+--      dist_x : Integer;
+--      dist_y : Integer;
       list   : item_list := (others => 0);
    begin
       for i in 1 .. planet_count loop
-         dist_x := Integer(p.x) - Integer(planets(i).pos.x);
-         dist_y := Integer(p.y) - Integer(planets(i).pos.y);
-         if (not planets(i).destr) and ((abs dist_x) <= 1) and ((abs dist_y) <= 1) then
+--         dist_x := Integer(p.x) - Integer(planets(i).pos.x);
+--         dist_y := Integer(p.y) - Integer(planets(i).pos.y);
+--         if (not planets(i).destr) and ((abs dist_x) <= 1) and ((abs dist_y) <= 1) then
+         if (not planets(i).destr) and (dist2(p, planets(i).pos) <= 2) then
             count := count + 1;
             list(count) := i;
          end if;
       end loop;
       c := count;
       return list;
+   end;
+   --
+   --  Check if ship is adjacent to object of type o.  Mostly used to see if ship
+   --  is next to a starbase for docking.
+   --
+   function check_adjacent(o : sr_data) return Boolean is
+      pos : sr_pos := ship.pos_sr;
+   begin
+      if pos.x > sector_size'First then
+         if pos.y > sector_size'First then
+            if sect(pos.x - 1, pos.y - 1) = o then
+               return True;
+            end if;
+         end if;
+         if sect(pos.x - 1, pos.y) = o then
+           return True;
+         end if;
+         if pos.y < sector_size'Last then
+            if sect(pos.x - 1, pos.y + 1) = o then
+               return True;
+            end if;
+         end if;
+      end if;
+      if pos.y > sector_size'First then
+         if sect(pos.x, pos.y - 1) = o then
+            return True;
+         end if;
+      end if;
+      if pos.y < sector_size'Last then
+         if sect(pos.x, pos.y + 1) = o then
+            return True;
+         end if;
+      end if;
+      if pos.x < sector_size'Last then
+         if pos.y > sector_size'First then
+            if sect(pos.x + 1, pos.y - 1) = o then
+               return True;
+            end if;
+         end if;
+         if sect(pos.x + 1, pos.y) = o then
+            return True;
+         end if;
+         if pos.y < sector_size'Last then
+            if sect(pos.x + 1, pos.y + 1) = o then
+               return True;
+            end if;
+         end if;
+      end if;
+      return False;
+   end;
+   --
+   --  Compute distance squared between two points.  Points must be both lr_pos
+   --  or sr_pos.
+   --
+   --  Have to use Integer because p1.x - p2.x or p1.y - p2.y might be negative.
+   --  The square of the difference will be positive, so the return value can be
+   --  Natural.
+   --
+   function dist2(p1, p2 : sr_pos) return Natural is
+      dist_x : Integer := Integer(p1.x) - Integer(p2.x);
+      dist_y : Integer := Integer(p1.y) - Integer(p2.y);
+   begin
+      return Natural(dist_x*dist_x + dist_y*dist_y);
+   end;
+   --
+   function dist2(p1, p2 : lr_pos) return Natural is
+      dist_x : Integer := Integer(p1.x) - Integer(p2.x);
+      dist_y : Integer := Integer(p1.y) - Integer(p2.y);
+   begin
+      return Natural(dist_x*dist_x + dist_y*dist_y);
    end;
    --
 end data;

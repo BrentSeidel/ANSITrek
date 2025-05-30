@@ -153,6 +153,16 @@ package data is
    --
    function adjacent_planet(p : sr_pos; c : out Natural) return item_list;
    --
+   --  Check if ship is adjacent to object of type o.
+   --
+   function check_adjacent(o : sr_data) return Boolean;
+   --
+   --  Compute distance squared between two points.  Points must be both lr_pos
+   --  or sr_pos.
+   --
+   function dist2(p1, p2 : sr_pos) return Natural;
+   function dist2(p1, p2 : lr_pos) return Natural;
+   --
 private
    --
    --  Random number generator states
