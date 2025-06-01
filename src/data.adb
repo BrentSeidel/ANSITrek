@@ -59,10 +59,10 @@ package body data is
    procedure init_sr(x, y : galaxy_size) is
       x1 : sector_size := rnd_sect.Random(g5);
       y1 : sector_size := rnd_sect.Random(g5);
-      index : Natural;
    begin
       --
       --  Initialize sector to empty
+      --
       for i in sector_size'Range loop
          for j in sector_size'Range loop
             sect(i, j) := empty;
@@ -82,32 +82,28 @@ package body data is
       end loop;
       --
       planet_count := u(x, y).planets;
-      index := 1;
       for i in 1 .. u(x, y).planets loop
          while sect(x1, y1) /= empty loop
             x1 := rnd_sect.Random(g5);
             y1 := rnd_sect.Random(g5);
          end loop;
          sect(x1, y1) := planet;
-         planets(index).pos     := (x1, y1);
-         planets(index).fuel    := Natural(Ada.Numerics.Float_Random.Random(g6)*100.0);
-         planets(index).scanned := False;
-         index := index + 1;
+         planets(i).pos     := (x1, y1);
+         planets(i).fuel    := Natural(Ada.Numerics.Float_Random.Random(g6)*1000.0);
+         planets(i).scanned := False;
       end loop;
       --
       enemy_count := u(x, y).enemies;
-      index := 1;
       for i in 1 .. u(x, y).enemies loop
          while sect(x1, y1) /= empty loop
             x1 := rnd_sect.Random(g5);
             y1 := rnd_sect.Random(g5);
          end loop;
          sect(x1, y1) := enemy1;
-         enemies(index).pos    := (x1, y1);
-         enemies(index).energy := 1000;
-         enemies(index).destr  := False;
-         enemies(index).shot   := 0;
-         index := index + 1;
+         enemies(i).pos    := (x1, y1);
+         enemies(i).energy := 1000;
+         enemies(i).destr  := False;
+         enemies(i).shot   := 0;
       end loop;
       --
       if u(x, y).base then
@@ -123,7 +119,7 @@ package body data is
    begin
       ship.pos_lr.x := (galaxy_size'First + galaxy_size'Last) / 2;
       ship.pos_lr.y := (galaxy_size'First + galaxy_size'Last) / 2;
-      ship.pos_sr.x := (sector_size'First + sector_size'Last) / 2 + 1;
+      ship.pos_sr.x := (sector_size'First + sector_size'Last) / 2;
       ship.pos_sr.y := (sector_size'First + sector_size'Last) / 2;
       ship.energy  := full_fuel;
       ship.shield  := 1000;
