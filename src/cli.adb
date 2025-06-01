@@ -111,10 +111,6 @@ package body cli is
             screen.draw_msg("Unrecognized command <" & Ada.Strings.Unbounded.To_String(first) & ">");
          end if;
       end loop;
-      Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
-      Ada.Text_IO.Put_Line("Total planets destroyed: " & Natural'Image(data.planets_destr));
-      Ada.Text_IO.Put_Line("Total bases destroyed:   " & Natural'Image(data.bases_destr));
-      Ada.Text_IO.Put_Line(BBS.ANSI.rst);
    end;
    --
    --  Split on whitespace.  String is passed in in "rest".  The next
@@ -270,7 +266,7 @@ package body cli is
       for i in 1 .. data.planet_count loop
          dist_x := Integer(data.ship.pos_sr.x) - Integer(data.planets(i).pos.x);
          dist_y := Integer(data.ship.pos_sr.y) - Integer(data.planets(i).pos.y);
-         if (not data.planets(i).destr) and ((abs dist_x) <= data.scan_range) and ((abs dist_y) <= data.scan_range) then
+         if ((abs dist_x) <= data.scan_range) and ((abs dist_y) <= data.scan_range) then
             data.planets(i).scanned := True;
             scan_count := scan_count + 1;
          end if;
@@ -309,10 +305,8 @@ package body cli is
             data.sect(pos.x, pos.y) := data.empty;
          elsif target = data.planet then
             data.attack_planet(pos, data.torp_energy);
-         elsif target = data.star then
-            cas.set_msg(cas.dest_star, cas.alert, True);
-            data.u(lr.x, lr.y).stars := data.u(lr.x, lr.y).stars - 1;
-            data.sect(pos.x, pos.y) := data.empty;
+         elsif target = data.star then  --  Stars can't be destroyed.
+            screen.draw_msg("The torpedo disappears into raging plasma that is a star");
          elsif target = data.enemy1 then
             data.attack_enemy(pos, data.torp_energy);
          elsif target = data.empty then

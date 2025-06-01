@@ -92,8 +92,8 @@ package data is
    type planet_state is record
       pos     : sr_pos;
       fuel    : Natural;
-      scanned : Boolean;
-      destr   : Boolean;
+      scanned : Boolean;  --  Planet has been scanned
+--      destr   : Boolean;  --  Planet has been destroyed (obsolete)
    end record;
    type planet_list is array (1 .. 10) of planet_state;
    --

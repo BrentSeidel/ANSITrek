@@ -18,6 +18,7 @@
 --
 --
 with Ada.Text_IO;
+with BBS.ANSI;
 with cas;
 with cli;
 with data;
@@ -29,4 +30,11 @@ begin
    cli.init;
    cas.init;
    cli.cmds;
+   --
+   --  Print ending statistics
+   --
+   Ada.Text_IO.Put_Line("Total enemies destroyed: " & Natural'Image(data.enemies_killed));
+   Ada.Text_IO.Put_Line("Total planets attacked:  " & Natural'Image(data.planets_destr));
+   Ada.Text_IO.Put_Line("Total bases destroyed:   " & Natural'Image(data.bases_destr));
+   Ada.Text_IO.Put_Line(BBS.ANSI.rst);
 end;

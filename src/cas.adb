@@ -30,8 +30,6 @@ package body cas is
       msg_list(occupied).text    := msg_occupied'Access;
       msg_list(dest_self).text   := msg_dest_self'Access;
       msg_list(dest_base).text   := msg_dest_base'Access;
-      msg_list(dest_planet).text := msg_dest_planet'Access;
-      msg_list(dest_star).text   := msg_dest_star'Access;
       msg_list(dest_enemy1).text := msg_dest_enemy1'Access;
       msg_list(dest_empty).text  := msg_dest_empty'Access;
       msg_list(internal).text    := msg_internal'Access;

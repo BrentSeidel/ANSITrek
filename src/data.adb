@@ -91,7 +91,6 @@ package body data is
          sect(x1, y1) := planet;
          planets(index).pos     := (x1, y1);
          planets(index).fuel    := Natural(Ada.Numerics.Float_Random.Random(g6)*100.0);
-         planets(index).destr   := False;
          planets(index).scanned := False;
          index := index + 1;
       end loop;
@@ -138,7 +137,10 @@ package body data is
    --
    --  Utility functions
    --
-   --  Attack the planet at the specified location
+   --  Attack the planet at the specified location.  Really the gravitational
+   --  binding energy of a planet is on the order of 10E32 Joules and a megaton
+   --  is about 4x10E15 Joules, so the odds of actually destroying a planet
+   --  are minimal. The resources on a planet are another matter.
    --
    procedure attack_planet(p : sr_pos; e : Natural) is
       lr : lr_pos := ship.pos_lr;
@@ -153,20 +155,10 @@ package body data is
       --
       for i in 1 .. planet_count loop
          if (planets(i).pos.x = p.x) and (planets(i).pos.y = p.y) then
-            sect(p.x, p.y) := empty;
-            cas.set_msg(cas.dest_planet, cas.alert, True);
+            screen.draw_msg("You attacked a planet, doing serious damage to its resources");
             u(lr.x, lr.y).planets := u(lr.x, lr.y).planets - 1;
-            planets(i).destr := True;
             planets(i).fuel := 0;
             planets_destr := planets_destr + 1;
-            --
-            --  Check if ship is in orbit around this planet.
-            --
-            if (ship.orbit = i) then
-               ship.orbit := 0;
-               ship.loc   := space;
-               screen.draw_msg("You destroyed the planet that you're orbiting!");
-            end if;
             return;
          end if;
       end loop;
@@ -251,15 +243,10 @@ package body data is
    --
    function adjacent_planet(p : sr_pos; c : out Natural) return item_list is
       count  : Natural := 0;
---      dist_x : Integer;
---      dist_y : Integer;
       list   : item_list := (others => 0);
    begin
       for i in 1 .. planet_count loop
---         dist_x := Integer(p.x) - Integer(planets(i).pos.x);
---         dist_y := Integer(p.y) - Integer(planets(i).pos.y);
---         if (not planets(i).destr) and ((abs dist_x) <= 1) and ((abs dist_y) <= 1) then
-         if (not planets(i).destr) and (dist2(p, planets(i).pos) <= 2) then
+         if dist2(p, planets(i).pos) <= 2 then
             count := count + 1;
             list(count) := i;
          end if;
